@@ -1,32 +1,54 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash2, Shuffle } from "lucide-react";
+import { Trash2, Shuffle, Upload, User } from "lucide-react";
 import { toast } from "sonner";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
-interface Match {
-  player1: string | null;
-  player2: string | null;
-  winner?: string | null;
+interface Participant {
+  name: string;
+  image?: string;
 }
 
-interface Round {
-  matches: Match[];
+interface MatchUp {
+  participant: Participant;
+  opponents: Participant[];
 }
 
 export const BracketGenerator = () => {
-  const [participants, setParticipants] = useState<string[]>([]);
+  const [participants, setParticipants] = useState<Participant[]>([]);
   const [currentName, setCurrentName] = useState("");
-  const [bracket, setBracket] = useState<Round[]>([]);
+  const [currentImage, setCurrentImage] = useState<string | undefined>();
+  const [matchups, setMatchups] = useState<MatchUp[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Image must be less than 5MB");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setCurrentImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const addParticipant = () => {
     const name = currentName.trim();
-    if (name && !participants.includes(name)) {
-      setParticipants([...participants, name]);
+    if (name && !participants.find(p => p.name === name)) {
+      setParticipants([...participants, { name, image: currentImage }]);
       setCurrentName("");
+      setCurrentImage(undefined);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
       toast.success(`${name} added to the tournament!`);
-    } else if (participants.includes(name)) {
+    } else if (participants.find(p => p.name === name)) {
       toast.error("This name is already in the tournament!");
     }
   };
@@ -34,7 +56,7 @@ export const BracketGenerator = () => {
   const removeParticipant = (index: number) => {
     const removed = participants[index];
     setParticipants(participants.filter((_, i) => i !== index));
-    toast.info(`${removed} removed from tournament`);
+    toast.info(`${removed.name} removed from tournament`);
   };
 
   const shuffleArray = <T,>(array: T[]): T[] => {
@@ -46,146 +68,186 @@ export const BracketGenerator = () => {
     return shuffled;
   };
 
-  const generateBracket = () => {
-    if (participants.length < 2) {
-      toast.error("Add at least 2 participants to create a bracket!");
+  const generateTournament = () => {
+    if (participants.length < 4) {
+      toast.error("Add at least 4 participants to create a tournament!");
       return;
     }
 
-    const shuffled = shuffleArray([...participants]);
-    const rounds: Round[] = [];
-    let currentRound = shuffled;
+    const newMatchups: MatchUp[] = [];
 
-    // Create first round with all participants
-    const firstRoundMatches: Match[] = [];
-    for (let i = 0; i < currentRound.length; i += 2) {
-      firstRoundMatches.push({
-        player1: currentRound[i],
-        player2: currentRound[i + 1] || null, // Handle odd number
+    participants.forEach((participant) => {
+      // Get all other participants
+      const availableOpponents = participants.filter(p => p.name !== participant.name);
+      
+      // Shuffle and take first 3
+      const shuffled = shuffleArray(availableOpponents);
+      const opponents = shuffled.slice(0, 3);
+
+      newMatchups.push({
+        participant,
+        opponents,
       });
-    }
-    rounds.push({ matches: firstRoundMatches });
+    });
 
-    // Create subsequent rounds
-    let matchCount = firstRoundMatches.length;
-    while (matchCount > 1) {
-      matchCount = Math.ceil(matchCount / 2);
-      const roundMatches: Match[] = [];
-      for (let i = 0; i < matchCount; i++) {
-        roundMatches.push({
-          player1: null,
-          player2: null,
-        });
-      }
-      rounds.push({ matches: roundMatches });
-    }
-
-    setBracket(rounds);
-    toast.success("Bracket generated! Let the games begin!");
+    setMatchups(newMatchups);
+    toast.success("Tournament matchups generated!");
   };
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
-      <div className="max-w-7xl mx-auto space-y-8">
+      <div className="max-w-6xl mx-auto space-y-8">
         {/* Header */}
-        <div className="text-center space-y-4">
+        <div className="text-center space-y-4 animate-fade-in">
           <h1 className="text-5xl md:text-7xl font-black bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            Tournament Bracket
+            Tournament Generator
           </h1>
           <p className="text-xl text-muted-foreground">
-            Create random tournament brackets in seconds
+            Each participant gets 3 random opponents
           </p>
         </div>
 
         {/* Input Section */}
-        <Card className="p-6 shadow-[var(--shadow-glow)]">
+        <Card className="p-6 shadow-[var(--shadow-glow)] animate-scale-in">
           <div className="space-y-4">
-            <div className="flex gap-2">
-              <Input
-                placeholder="Enter participant name..."
-                value={currentName}
-                onChange={(e) => setCurrentName(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && addParticipant()}
-                className="flex-1"
-              />
-              <Button onClick={addParticipant} size="lg">
-                Add
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1 space-y-4">
+                <Input
+                  placeholder="Enter participant name..."
+                  value={currentName}
+                  onChange={(e) => setCurrentName(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && addParticipant()}
+                  className="text-lg"
+                />
+                
+                <div className="flex items-center gap-4">
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleImageUpload}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                  <Button
+                    onClick={() => fileInputRef.current?.click()}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    {currentImage ? "Change Image" : "Upload Image"}
+                  </Button>
+                  
+                  {currentImage && (
+                    <Avatar className="w-16 h-16 border-2 border-primary">
+                      <AvatarImage src={currentImage} alt="Preview" />
+                    </Avatar>
+                  )}
+                </div>
+              </div>
+
+              <Button onClick={addParticipant} size="lg" className="md:w-32 h-auto">
+                Add Player
               </Button>
             </div>
 
             {participants.length > 0 && (
               <>
-                <div className="flex flex-wrap gap-2">
-                  {participants.map((name, index) => (
-                    <div
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 animate-fade-in">
+                  {participants.map((participant, index) => (
+                    <Card
                       key={index}
-                      className="flex items-center gap-2 bg-muted px-4 py-2 rounded-lg group hover:bg-destructive/10 transition-colors"
+                      className="p-4 flex items-center gap-3 group hover:shadow-lg transition-all hover:scale-[1.02] animate-slide-in"
+                      style={{ animationDelay: `${index * 0.05}s` }}
                     >
-                      <span className="font-medium">{name}</span>
+                      <Avatar className="w-12 h-12 border-2 border-primary/20">
+                        <AvatarImage src={participant.image} alt={participant.name} />
+                        <AvatarFallback className="bg-primary/10 text-primary font-bold">
+                          <User className="w-6 h-6" />
+                        </AvatarFallback>
+                      </Avatar>
+                      
+                      <span className="font-semibold flex-1 text-foreground">
+                        {participant.name}
+                      </span>
+                      
                       <button
                         onClick={() => removeParticipant(index)}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="opacity-0 group-hover:opacity-100 transition-opacity p-2 hover:bg-destructive/10 rounded-md"
                       >
                         <Trash2 className="w-4 h-4 text-destructive" />
                       </button>
-                    </div>
+                    </Card>
                   ))}
                 </div>
 
                 <Button
-                  onClick={generateBracket}
+                  onClick={generateTournament}
                   variant="gradient"
                   size="lg"
                   className="w-full text-lg font-bold"
                 >
                   <Shuffle className="w-5 h-5" />
-                  Generate Random Bracket
+                  Generate Tournament
                 </Button>
               </>
             )}
           </div>
         </Card>
 
-        {/* Bracket Display */}
-        {bracket.length > 0 && (
-          <div className="space-y-4">
-            <h2 className="text-3xl font-bold text-center">Tournament Bracket</h2>
-            <div className="overflow-x-auto pb-4">
-              <div className="flex gap-8 min-w-max">
-                {bracket.map((round, roundIndex) => (
-                  <div key={roundIndex} className="flex flex-col gap-4 min-w-[250px]">
-                    <h3 className="text-lg font-bold text-center text-primary">
-                      {roundIndex === bracket.length - 1
-                        ? "Final"
-                        : roundIndex === bracket.length - 2
-                        ? "Semi-Final"
-                        : `Round ${roundIndex + 1}`}
-                    </h3>
-                    <div className="flex flex-col gap-4 justify-around">
-                      {round.matches.map((match, matchIndex) => (
-                        <Card
-                          key={matchIndex}
-                          className="p-4 space-y-2 bg-card hover:shadow-lg transition-shadow"
-                        >
-                          <div className="flex items-center justify-between p-3 bg-muted rounded-md">
-                            <span className="font-semibold">
-                              {match.player1 || "TBD"}
-                            </span>
-                          </div>
-                          <div className="text-center text-xs text-muted-foreground font-bold">
-                            VS
-                          </div>
-                          <div className="flex items-center justify-between p-3 bg-muted rounded-md">
-                            <span className="font-semibold">
-                              {match.player2 || "TBD"}
-                            </span>
-                          </div>
-                        </Card>
-                      ))}
+        {/* Tournament Display */}
+        {matchups.length > 0 && (
+          <div className="space-y-6 animate-fade-in">
+            <h2 className="text-3xl font-bold text-center text-foreground">
+              Tournament Matchups
+            </h2>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {matchups.map((matchup, index) => (
+                <Card
+                  key={index}
+                  className="p-6 space-y-4 hover:shadow-xl transition-all animate-scale-in bg-gradient-to-br from-card to-card/80"
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
+                  {/* Main Participant */}
+                  <div className="flex items-center gap-4 p-4 bg-primary/5 rounded-lg border-2 border-primary/20">
+                    <Avatar className="w-16 h-16 border-2 border-primary">
+                      <AvatarImage src={matchup.participant.image} alt={matchup.participant.name} />
+                      <AvatarFallback className="bg-primary text-primary-foreground font-bold text-lg">
+                        <User className="w-8 h-8" />
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="text-sm text-muted-foreground font-medium">Player</p>
+                      <p className="text-xl font-bold text-foreground">
+                        {matchup.participant.name}
+                      </p>
                     </div>
                   </div>
-                ))}
-              </div>
+
+                  {/* Opponents */}
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                      Opponents
+                    </p>
+                    {matchup.opponents.map((opponent, oppIndex) => (
+                      <div
+                        key={oppIndex}
+                        className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors"
+                      >
+                        <Avatar className="w-10 h-10 border border-border">
+                          <AvatarImage src={opponent.image} alt={opponent.name} />
+                          <AvatarFallback className="bg-secondary text-secondary-foreground font-semibold">
+                            <User className="w-5 h-5" />
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="font-semibold text-foreground">
+                          {opponent.name}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              ))}
             </div>
           </div>
         )}
