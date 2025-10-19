@@ -74,24 +74,60 @@ export const BracketGenerator = () => {
       return;
     }
 
-    const newMatchups: MatchUp[] = [];
-
-    participants.forEach((participant) => {
-      // Get all other participants
-      const availableOpponents = participants.filter(p => p.name !== participant.name);
-      
-      // Shuffle and take first 3
-      const shuffled = shuffleArray(availableOpponents);
-      const opponents = shuffled.slice(0, 3);
-
-      newMatchups.push({
-        participant,
-        opponents,
-      });
+    // Track fights for each participant
+    const fightCount: { [name: string]: number } = {};
+    const participantOpponents: { [name: string]: Set<string> } = {};
+    
+    participants.forEach(p => {
+      fightCount[p.name] = 0;
+      participantOpponents[p.name] = new Set();
     });
 
+    // Shuffle participants for randomness
+    const shuffled = shuffleArray([...participants]);
+    
+    // Create matchups ensuring each participant has exactly 3 fights
+    const attempts = shuffled.length * 10; // Prevent infinite loops
+    let attempt = 0;
+    
+    while (attempt < attempts && Object.values(fightCount).some(count => count < 3)) {
+      attempt++;
+      
+      // Find participants who need more fights
+      const needFights = shuffled.filter(p => fightCount[p.name] < 3);
+      
+      for (let i = 0; i < needFights.length; i++) {
+        const p1 = needFights[i];
+        
+        if (fightCount[p1.name] >= 3) continue;
+        
+        // Find a valid opponent
+        for (let j = i + 1; j < needFights.length; j++) {
+          const p2 = needFights[j];
+          
+          if (fightCount[p2.name] >= 3) continue;
+          if (participantOpponents[p1.name].has(p2.name)) continue;
+          
+          // Create the matchup
+          participantOpponents[p1.name].add(p2.name);
+          participantOpponents[p2.name].add(p1.name);
+          fightCount[p1.name]++;
+          fightCount[p2.name]++;
+          break;
+        }
+      }
+    }
+
+    // Build the final matchup structure
+    const newMatchups: MatchUp[] = participants.map(participant => ({
+      participant,
+      opponents: Array.from(participantOpponents[participant.name])
+        .map(name => participants.find(p => p.name === name)!)
+        .filter(Boolean),
+    }));
+
     setMatchups(newMatchups);
-    toast.success("Tournament matchups generated!");
+    toast.success("Tournament matchups generated! Each player has exactly 3 fights.");
   };
 
   return (
