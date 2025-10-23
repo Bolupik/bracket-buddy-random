@@ -20,9 +20,10 @@ interface MatchCardProps {
   match: Match;
   participantName: string;
   onUpdateResult: (participantName: string, opponentName: string, score: string, result: 'win' | 'loss' | 'draw') => void;
+  isAdmin: boolean;
 }
 
-export const MatchCard = ({ match, participantName, onUpdateResult }: MatchCardProps) => {
+export const MatchCard = ({ match, participantName, onUpdateResult, isAdmin }: MatchCardProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [score, setScore] = useState(match.score || "");
 
@@ -53,7 +54,7 @@ export const MatchCard = ({ match, participantName, onUpdateResult }: MatchCardP
 
   if (match.completed && !isEditing) {
     return (
-      <div className="flex items-center gap-3 p-4 rounded-lg transition-all bg-primary/10 border-2 border-primary/30">
+      <div className="flex items-center gap-3 p-4 rounded-lg transition-all bg-primary/10 border-2 border-primary/30 shadow-sm hover:shadow-[var(--shadow-glow)]">
         <Avatar className="w-10 h-10 border border-border">
           <AvatarImage src={match.opponent.image} alt={match.opponent.name} />
           <AvatarFallback className="bg-secondary text-secondary-foreground font-semibold">
@@ -71,20 +72,22 @@ export const MatchCard = ({ match, participantName, onUpdateResult }: MatchCardP
           )}
         </div>
         {getResultBadge()}
-        <Button
-          onClick={() => setIsEditing(true)}
-          variant="ghost"
-          size="sm"
-        >
-          Edit
-        </Button>
+        {isAdmin && (
+          <Button
+            onClick={() => setIsEditing(true)}
+            variant="ghost"
+            size="sm"
+          >
+            Edit
+          </Button>
+        )}
       </div>
     );
   }
 
   if (isEditing || !match.completed) {
     return (
-      <div className="p-4 rounded-lg bg-muted/50 border-2 border-border space-y-3">
+      <div className="p-4 rounded-lg bg-card/60 backdrop-blur-sm border-2 border-primary/20 space-y-3 shadow-sm">
         <div className="flex items-center gap-3">
           <Avatar className="w-10 h-10 border border-border">
             <AvatarImage src={match.opponent.image} alt={match.opponent.name} />

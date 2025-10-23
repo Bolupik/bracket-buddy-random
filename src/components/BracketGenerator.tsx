@@ -29,6 +29,8 @@ export const BracketGenerator = () => {
   const [currentName, setCurrentName] = useState("");
   const [currentImage, setCurrentImage] = useState<string | undefined>();
   const [matchups, setMatchups] = useState<MatchUp[]>([]);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [tournamentCreated, setTournamentCreated] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -178,24 +180,54 @@ export const BracketGenerator = () => {
     }));
 
     setMatchups(newMatchups);
+    setTournamentCreated(true);
+    setIsAdmin(true);
     toast.success("Tournament matchups generated! Each player has exactly 3 fights.");
   };
 
+  const clearAllResults = () => {
+    setMatchups(matchups.map(matchup => ({
+      ...matchup,
+      matches: matchup.matches.map(match => ({
+        ...match,
+        completed: false,
+        score: undefined,
+        result: undefined
+      }))
+    })));
+    toast.info("All match results cleared");
+  };
+
+  const resetTournament = () => {
+    setMatchups([]);
+    setParticipants([]);
+    setIsAdmin(false);
+    setTournamentCreated(false);
+    toast.info("Tournament reset");
+  };
+
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
+    <div className="min-h-screen bg-[var(--gradient-dark)] p-4 md:p-8">
       <div className="max-w-6xl mx-auto space-y-8">
         {/* Header */}
-        <div className="text-center space-y-4 animate-fade-in">
-          <h1 className="text-5xl md:text-7xl font-black bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+        <div className="text-center space-y-4 animate-fade-in relative">
+          <div className="absolute inset-0 bg-[var(--gradient-primary)] opacity-10 blur-3xl -z-10"></div>
+          <h1 className="text-5xl md:text-7xl font-black bg-[var(--gradient-primary)] bg-clip-text text-transparent drop-shadow-lg">
             Tournament Generator
           </h1>
-          <p className="text-xl text-muted-foreground">
+          <p className="text-xl text-foreground/80 font-medium">
             Each participant gets 3 random opponents
           </p>
+          {isAdmin && (
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 border-2 border-primary/40 backdrop-blur-sm">
+              <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+              <span className="text-sm font-bold text-primary">ADMIN MODE</span>
+            </div>
+          )}
         </div>
 
         {/* Input Section */}
-        <Card className="p-6 shadow-[var(--shadow-glow)] animate-scale-in">
+        <Card className="p-6 shadow-[var(--shadow-intense)] animate-scale-in bg-card/95 backdrop-blur-sm border-2 border-primary/20">
           <div className="space-y-4">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1 space-y-4">
@@ -241,11 +273,11 @@ export const BracketGenerator = () => {
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 animate-fade-in">
                   {participants.map((participant, index) => (
-                    <Card
-                      key={index}
-                      className="p-4 flex items-center gap-3 group hover:shadow-lg transition-all hover:scale-[1.02] animate-slide-in"
-                      style={{ animationDelay: `${index * 0.05}s` }}
-                    >
+                  <Card
+                    key={index}
+                    className="p-4 flex items-center gap-3 group hover:shadow-[var(--shadow-glow)] transition-all hover:scale-[1.02] animate-slide-in bg-card/80 backdrop-blur-sm border-primary/20"
+                    style={{ animationDelay: `${index * 0.05}s` }}
+                  >
                       <Avatar className="w-12 h-12 border-2 border-primary/20">
                         <AvatarImage src={participant.image} alt={participant.name} />
                         <AvatarFallback className="bg-primary/10 text-primary font-bold">
@@ -284,25 +316,35 @@ export const BracketGenerator = () => {
         {/* Tournament Display */}
         {matchups.length > 0 && (
           <div className="space-y-6 animate-fade-in">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <h2 className="text-3xl font-bold text-foreground">
                 Tournament Matchups
               </h2>
-              <Button onClick={generateTournament} variant="outline" size="sm">
-                <Shuffle className="w-4 h-4 mr-2" />
-                Regenerate
-              </Button>
+              {isAdmin && (
+                <div className="flex gap-2">
+                  <Button onClick={generateTournament} variant="outline" size="sm" className="border-primary/40 hover:bg-primary/10">
+                    <Shuffle className="w-4 h-4 mr-2" />
+                    Regenerate
+                  </Button>
+                  <Button onClick={clearAllResults} variant="outline" size="sm" className="border-accent/40 hover:bg-accent/10">
+                    Clear Results
+                  </Button>
+                  <Button onClick={resetTournament} variant="outline" size="sm" className="border-destructive/40 hover:bg-destructive/10">
+                    Reset All
+                  </Button>
+                </div>
+              )}
             </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {matchups.map((matchup, index) => (
                 <Card
                   key={index}
-                  className="p-6 space-y-4 hover:shadow-xl transition-all animate-scale-in bg-gradient-to-br from-card to-card/80"
+                  className="p-6 space-y-4 hover:shadow-[var(--shadow-intense)] transition-all animate-scale-in bg-card/90 backdrop-blur-sm border-2 border-primary/20"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   {/* Main Participant */}
-                  <div className="flex items-center gap-4 p-4 bg-primary/5 rounded-lg border-2 border-primary/20">
+                  <div className="flex items-center gap-4 p-4 bg-primary/10 rounded-lg border-2 border-primary/30 shadow-[var(--shadow-glow)]">
                     <Avatar className="w-16 h-16 border-2 border-primary">
                       <AvatarImage src={matchup.participant.image} alt={matchup.participant.name} />
                       <AvatarFallback className="bg-primary text-primary-foreground font-bold text-lg">
@@ -328,6 +370,7 @@ export const BracketGenerator = () => {
                         match={match}
                         participantName={matchup.participant.name}
                         onUpdateResult={updateMatchResult}
+                        isAdmin={isAdmin}
                       />
                     ))}
                   </div>
