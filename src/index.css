@@ -87,6 +87,21 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground dark;
+  }
+}
+
+@layer utilities {
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-30px) rotate(10deg);
+    }
+  }
+  
+  .animate-float {
+    animation: float 20s ease-in-out infinite;
   }
 }

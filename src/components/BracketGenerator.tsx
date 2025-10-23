@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,7 +31,30 @@ export const BracketGenerator = () => {
   const [matchups, setMatchups] = useState<MatchUp[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [tournamentCreated, setTournamentCreated] = useState(false);
+  const [pokemonImages, setPokemonImages] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch random Pokemon images
+  useEffect(() => {
+    const fetchPokemon = async () => {
+      const images: string[] = [];
+      const randomIds = Array.from({ length: 20 }, () => Math.floor(Math.random() * 898) + 1);
+      
+      for (const id of randomIds) {
+        try {
+          const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+          const data = await response.json();
+          images.push(data.sprites.other['official-artwork'].front_default);
+        } catch (error) {
+          console.error('Failed to fetch Pokemon:', error);
+        }
+      }
+      
+      setPokemonImages(images);
+    };
+    
+    fetchPokemon();
+  }, []);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -207,8 +230,27 @@ export const BracketGenerator = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--gradient-dark)] p-4 md:p-8">
-      <div className="max-w-6xl mx-auto space-y-8">
+    <div className="min-h-screen bg-[var(--gradient-dark)] p-4 md:p-8 relative overflow-hidden">
+      {/* Pokemon Background */}
+      <div className="fixed inset-0 pointer-events-none opacity-10 z-0">
+        {pokemonImages.map((img, index) => (
+          <img
+            key={index}
+            src={img}
+            alt=""
+            className="absolute animate-float"
+            style={{
+              width: `${80 + Math.random() * 120}px`,
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 5}s`,
+              animationDuration: `${15 + Math.random() * 10}s`,
+            }}
+          />
+        ))}
+      </div>
+      
+      <div className="max-w-6xl mx-auto space-y-8 relative z-10">
         {/* Header */}
         <div className="text-center space-y-4 animate-fade-in relative">
           <div className="absolute inset-0 bg-[var(--gradient-primary)] opacity-10 blur-3xl -z-10"></div>
