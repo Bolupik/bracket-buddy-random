@@ -2,11 +2,11 @@ import { useState, useRef, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash2, Shuffle, Upload, User, Award, BarChart3 } from "lucide-react";
+import { Trash2, Shuffle, Upload, User, Award, BarChart3, Share2, Copy } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { MatchCard } from "./MatchCard";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import stackingBanner from "@/assets/stacking-banner.png";
 import { Leaderboard } from "./Leaderboard";
 
@@ -36,8 +36,10 @@ export const BracketGenerator = () => {
   const [tournamentCreated, setTournamentCreated] = useState(false);
   const [pokemonImages, setPokemonImages] = useState<string[]>([]);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [tournamentId, setTournamentId] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   // Fetch random Pokemon images
   useEffect(() => {
@@ -68,6 +70,24 @@ export const BracketGenerator = () => {
       setParticipants(JSON.parse(savedParticipants));
     }
   }, []);
+
+  // Load tournament from URL parameter
+  useEffect(() => {
+    const id = searchParams.get('id');
+    if (id) {
+      const savedTournament = localStorage.getItem(`tournament_${id}`);
+      if (savedTournament) {
+        const data = JSON.parse(savedTournament);
+        setMatchups(data.matchups);
+        setParticipants(data.participants);
+        setTournamentCreated(true);
+        setTournamentId(id);
+        toast.success("Tournament loaded!");
+      } else {
+        toast.error("Tournament not found");
+      }
+    }
+  }, [searchParams]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -221,7 +241,27 @@ export const BracketGenerator = () => {
     setMatchups(newMatchups);
     setTournamentCreated(true);
     setIsAdmin(true);
+    
+    // Generate and save tournament with unique ID
+    const id = Date.now().toString(36) + Math.random().toString(36).substring(2);
+    setTournamentId(id);
+    localStorage.setItem(`tournament_${id}`, JSON.stringify({
+      matchups: newMatchups,
+      participants
+    }));
+    
     toast.success("Tournament matchups generated! Each player has exactly 3 fights.");
+  };
+
+  const shareTournament = () => {
+    if (!tournamentId) {
+      toast.error("Please generate a tournament first");
+      return;
+    }
+    
+    const url = `${window.location.origin}/?id=${tournamentId}`;
+    navigator.clipboard.writeText(url);
+    toast.success("Tournament link copied to clipboard!");
   };
 
   const clearAllResults = () => {
@@ -414,24 +454,31 @@ export const BracketGenerator = () => {
                 </h2>
                 <Button
                   onClick={() => setShowLeaderboard(!showLeaderboard)}
-                  variant="outline"
+                  variant="dark"
                   size="sm"
-                  className="border-primary/40 hover:bg-primary/10"
                 >
                   <BarChart3 className="w-4 h-4 mr-2" />
                   {showLeaderboard ? "View Matchups" : "View Leaderboard"}
                 </Button>
+                <Button
+                  onClick={shareTournament}
+                  variant="dark"
+                  size="sm"
+                >
+                  <Share2 className="w-4 h-4 mr-2" />
+                  Share
+                </Button>
               </div>
               {isAdmin && !showLeaderboard && (
                 <div className="flex gap-2">
-                  <Button onClick={generateTournament} variant="outline" size="sm" className="border-primary/40 hover:bg-primary/10">
+                  <Button onClick={generateTournament} variant="dark" size="sm">
                     <Shuffle className="w-4 h-4 mr-2" />
                     Regenerate
                   </Button>
-                  <Button onClick={clearAllResults} variant="outline" size="sm" className="border-accent/40 hover:bg-accent/10">
+                  <Button onClick={clearAllResults} variant="dark" size="sm">
                     Clear Results
                   </Button>
-                  <Button onClick={resetTournament} variant="outline" size="sm" className="border-destructive/40 hover:bg-destructive/10">
+                  <Button onClick={resetTournament} variant="destructive" size="sm">
                     Reset All
                   </Button>
                 </div>

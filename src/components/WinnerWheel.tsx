@@ -1,8 +1,14 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Trophy, RotateCw } from "lucide-react";
+import { Trophy, RotateCw, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface Participant {
   name: string;
@@ -17,6 +23,7 @@ export const WinnerWheel = ({ participants }: WinnerWheelProps) => {
   const [isSpinning, setIsSpinning] = useState(false);
   const [rotation, setRotation] = useState(0);
   const [winner, setWinner] = useState<Participant | null>(null);
+  const [showWinnerDialog, setShowWinnerDialog] = useState(false);
   const wheelRef = useRef<HTMLDivElement>(null);
 
   const colors = [
@@ -48,6 +55,7 @@ export const WinnerWheel = ({ participants }: WinnerWheelProps) => {
       
       setWinner(participants[winnerIndex]);
       setIsSpinning(false);
+      setShowWinnerDialog(true);
       toast.success(`🎉 Winner: ${participants[winnerIndex].name}!`);
     }, 4000);
   };
@@ -55,6 +63,7 @@ export const WinnerWheel = ({ participants }: WinnerWheelProps) => {
   const resetWheel = () => {
     setRotation(0);
     setWinner(null);
+    setShowWinnerDialog(false);
   };
 
   if (participants.length === 0) {
@@ -182,6 +191,41 @@ export const WinnerWheel = ({ participants }: WinnerWheelProps) => {
           </Card>
         )}
       </div>
+
+      {/* Winner Announcement Dialog */}
+      <Dialog open={showWinnerDialog} onOpenChange={setShowWinnerDialog}>
+        <DialogContent className="sm:max-w-md bg-gradient-to-br from-primary/20 via-accent/20 to-primary/20 border-4 border-primary">
+          <DialogHeader>
+            <DialogTitle className="text-center text-4xl font-black text-primary flex items-center justify-center gap-3">
+              <Sparkles className="w-10 h-10 animate-pulse" />
+              WINNER ANNOUNCED!
+              <Sparkles className="w-10 h-10 animate-pulse" />
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col items-center justify-center space-y-6 py-8">
+            <div className="relative">
+              <Trophy className="w-32 h-32 text-primary animate-bounce" />
+              <div className="absolute inset-0 bg-primary/20 blur-3xl animate-pulse"></div>
+            </div>
+            <div className="text-center space-y-2">
+              <p className="text-6xl font-black text-foreground animate-scale-in">
+                {winner?.name}
+              </p>
+              <p className="text-2xl text-primary font-bold">
+                Congratulations! 🎉
+              </p>
+            </div>
+            <Button
+              onClick={() => setShowWinnerDialog(false)}
+              size="lg"
+              variant="dark"
+              className="text-xl px-12 py-6"
+            >
+              Close
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
