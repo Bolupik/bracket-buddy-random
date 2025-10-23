@@ -2,10 +2,11 @@ import { useState, useRef, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash2, Shuffle, Upload, User } from "lucide-react";
+import { Trash2, Shuffle, Upload, User, Award } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { MatchCard } from "./MatchCard";
+import { useNavigate } from "react-router-dom";
 
 interface Participant {
   name: string;
@@ -33,6 +34,7 @@ export const BracketGenerator = () => {
   const [tournamentCreated, setTournamentCreated] = useState(false);
   const [pokemonImages, setPokemonImages] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
 
   // Fetch random Pokemon images
   useEffect(() => {
@@ -56,6 +58,14 @@ export const BracketGenerator = () => {
     fetchPokemon();
   }, []);
 
+  // Load participants from localStorage
+  useEffect(() => {
+    const savedParticipants = localStorage.getItem("tournamentParticipants");
+    if (savedParticipants) {
+      setParticipants(JSON.parse(savedParticipants));
+    }
+  }, []);
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -76,6 +86,7 @@ export const BracketGenerator = () => {
     if (name && !participants.find(p => p.name === name)) {
       const newParticipants = [...participants, { name, image: currentImage }];
       setParticipants(newParticipants);
+      localStorage.setItem("tournamentParticipants", JSON.stringify(newParticipants));
       setCurrentName("");
       setCurrentImage(undefined);
       if (fileInputRef.current) {
@@ -94,7 +105,9 @@ export const BracketGenerator = () => {
 
   const removeParticipant = (index: number) => {
     const removed = participants[index];
-    setParticipants(participants.filter((_, i) => i !== index));
+    const newParticipants = participants.filter((_, i) => i !== index);
+    setParticipants(newParticipants);
+    localStorage.setItem("tournamentParticipants", JSON.stringify(newParticipants));
     toast.info(`${removed.name} removed from tournament`);
   };
 
@@ -254,18 +267,42 @@ export const BracketGenerator = () => {
         {/* Header */}
         <div className="text-center space-y-4 animate-fade-in relative">
           <div className="absolute inset-0 bg-[var(--gradient-primary)] opacity-10 blur-3xl -z-10"></div>
-          <h1 className="text-5xl md:text-7xl font-black bg-[var(--gradient-primary)] bg-clip-text text-transparent drop-shadow-lg">
-            Tournament Generator
-          </h1>
-          <p className="text-xl text-foreground/80 font-medium">
+          <div className="relative">
+            <h1 className="text-6xl md:text-8xl font-black tracking-tighter">
+              <span className="bg-[var(--gradient-primary)] bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(34,197,94,0.3)]">
+                STACKINGDAO
+              </span>
+            </h1>
+            <div className="flex items-center justify-center gap-3 mt-2">
+              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary to-transparent"></div>
+              <p className="text-xl md:text-2xl font-bold text-primary/90 uppercase tracking-widest">
+                Pokemon Tournament Draw
+              </p>
+              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary to-transparent"></div>
+            </div>
+          </div>
+          <p className="text-lg text-foreground/70 font-medium">
             Each participant gets 3 random opponents
           </p>
-          {isAdmin && (
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 border-2 border-primary/40 backdrop-blur-sm">
-              <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
-              <span className="text-sm font-bold text-primary">ADMIN MODE</span>
-            </div>
-          )}
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            {isAdmin && (
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 border-2 border-primary/40 backdrop-blur-sm">
+                <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+                <span className="text-sm font-bold text-primary">ADMIN MODE</span>
+              </div>
+            )}
+            {participants.length > 0 && (
+              <Button
+                onClick={() => navigate("/wheel")}
+                variant="gradient"
+                size="lg"
+                className="gap-2"
+              >
+                <Award className="w-5 h-5" />
+                Winner Selection Wheel
+              </Button>
+            )}
+          </div>
         </div>
 
         {/* Input Section */}
