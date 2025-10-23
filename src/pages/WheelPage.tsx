@@ -3,6 +3,7 @@ import { WinnerWheel } from "@/components/WinnerWheel";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import stackingBanner from "@/assets/stacking-banner.png";
 
 interface Participant {
   name: string;
@@ -66,6 +67,15 @@ export default function WheelPage() {
       </div>
 
       <div className="max-w-6xl mx-auto space-y-8 relative z-10">
+        {/* Banner Image */}
+        <div className="w-full animate-fade-in">
+          <img 
+            src={stackingBanner} 
+            alt="STACKING DAO" 
+            className="w-full h-auto rounded-lg shadow-[var(--shadow-intense)] border-2 border-primary/30"
+          />
+        </div>
+
         {/* Header */}
         <div className="text-center space-y-4 animate-fade-in relative">
           <Button

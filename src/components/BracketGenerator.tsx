@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { MatchCard } from "./MatchCard";
 import { useNavigate } from "react-router-dom";
+import stackingBanner from "@/assets/stacking-banner.png";
 
 interface Participant {
   name: string;
@@ -264,6 +265,15 @@ export const BracketGenerator = () => {
       </div>
       
       <div className="max-w-6xl mx-auto space-y-8 relative z-10">
+        {/* Banner Image */}
+        <div className="w-full animate-fade-in">
+          <img 
+            src={stackingBanner} 
+            alt="STACKING DAO" 
+            className="w-full h-auto rounded-lg shadow-[var(--shadow-intense)] border-2 border-primary/30"
+          />
+        </div>
+
         {/* Header */}
         <div className="text-center space-y-4 animate-fade-in relative">
           <div className="absolute inset-0 bg-[var(--gradient-primary)] opacity-10 blur-3xl -z-10"></div>
