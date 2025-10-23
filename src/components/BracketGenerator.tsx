@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Trash2, Shuffle, Upload, User } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { MatchCard } from "./MatchCard";
 
 interface Participant {
   name: string;
@@ -14,6 +15,8 @@ interface Participant {
 interface Match {
   opponent: Participant;
   completed: boolean;
+  score?: string;
+  result?: 'win' | 'loss' | 'draw';
 }
 
 interface MatchUp {
@@ -79,31 +82,40 @@ export const BracketGenerator = () => {
     return shuffled;
   };
 
-  const toggleMatchComplete = (participantName: string, opponentName: string) => {
+  const updateMatchResult = (
+    participantName: string,
+    opponentName: string,
+    score: string,
+    result: 'win' | 'loss' | 'draw'
+  ) => {
+    const oppositeResult = result === 'win' ? 'loss' : result === 'loss' ? 'win' : 'draw';
+    
     setMatchups(matchups.map(matchup => {
       if (matchup.participant.name === participantName) {
         return {
           ...matchup,
           matches: matchup.matches.map(match =>
             match.opponent.name === opponentName
-              ? { ...match, completed: !match.completed }
+              ? { ...match, completed: true, score, result }
               : match
           ),
         };
       }
-      // Also toggle for the opponent's matchup
+      // Also update for the opponent's matchup with opposite result
       if (matchup.participant.name === opponentName) {
         return {
           ...matchup,
           matches: matchup.matches.map(match =>
             match.opponent.name === participantName
-              ? { ...match, completed: !match.completed }
+              ? { ...match, completed: true, score, result: oppositeResult }
               : match
           ),
         };
       }
       return matchup;
     }));
+    
+    toast.success(`Match result recorded: ${score}`);
   };
 
   const generateTournament = () => {
@@ -306,36 +318,17 @@ export const BracketGenerator = () => {
                   </div>
 
                   {/* Opponents */}
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
                       Matches ({matchup.matches.filter(m => m.completed).length}/3 completed)
                     </p>
                     {matchup.matches.map((match, matchIndex) => (
-                      <div
+                      <MatchCard
                         key={matchIndex}
-                        className={`flex items-center gap-3 p-3 rounded-lg transition-all ${
-                          match.completed
-                            ? 'bg-primary/10 border-2 border-primary/30'
-                            : 'bg-muted/50 border-2 border-transparent hover:bg-muted'
-                        }`}
-                      >
-                        <Avatar className="w-10 h-10 border border-border">
-                          <AvatarImage src={match.opponent.image} alt={match.opponent.name} />
-                          <AvatarFallback className="bg-secondary text-secondary-foreground font-semibold">
-                            <User className="w-5 h-5" />
-                          </AvatarFallback>
-                        </Avatar>
-                        <span className={`font-semibold flex-1 ${match.completed ? 'text-primary' : 'text-foreground'}`}>
-                          {match.opponent.name}
-                        </span>
-                        <Button
-                          onClick={() => toggleMatchComplete(matchup.participant.name, match.opponent.name)}
-                          variant={match.completed ? "default" : "outline"}
-                          size="sm"
-                        >
-                          {match.completed ? "✓ Done" : "Mark Complete"}
-                        </Button>
-                      </div>
+                        match={match}
+                        participantName={matchup.participant.name}
+                        onUpdateResult={updateMatchResult}
+                      />
                     ))}
                   </div>
                 </Card>
