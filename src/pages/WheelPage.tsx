@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { WinnerWheel } from "@/components/WinnerWheel";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import stackingBanner from "@/assets/stacking-banner.png";
@@ -14,14 +14,24 @@ export default function WheelPage() {
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [pokemonImages, setPokemonImages] = useState<string[]>([]);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const mode = searchParams.get("mode");
+  const isTiebreaker = mode === "tiebreaker";
 
   // Load participants from localStorage
   useEffect(() => {
-    const savedParticipants = localStorage.getItem("tournamentParticipants");
-    if (savedParticipants) {
-      setParticipants(JSON.parse(savedParticipants));
+    if (isTiebreaker) {
+      const tiebreakerData = localStorage.getItem("tiebreakerParticipants");
+      if (tiebreakerData) {
+        setParticipants(JSON.parse(tiebreakerData));
+      }
+    } else {
+      const savedParticipants = localStorage.getItem("tournamentParticipants");
+      if (savedParticipants) {
+        setParticipants(JSON.parse(savedParticipants));
+      }
     }
-  }, []);
+  }, [isTiebreaker]);
 
   // Fetch random Pokemon images
   useEffect(() => {
@@ -97,13 +107,15 @@ export default function WheelPage() {
             <div className="flex items-center justify-center gap-3 mt-2">
               <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary to-transparent"></div>
               <p className="text-xl md:text-2xl font-bold text-primary/90 uppercase tracking-widest">
-                Winner Selection Wheel
+                {isTiebreaker ? "Tiebreaker Selection" : "Winner Selection Wheel"}
               </p>
               <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary to-transparent"></div>
             </div>
           </div>
           <p className="text-lg text-foreground/70 font-medium">
-            Spin the wheel to select a random winner!
+            {isTiebreaker
+              ? "Spin to resolve the tie and determine final rankings!"
+              : "Spin the wheel to select a random winner!"}
           </p>
         </div>
 

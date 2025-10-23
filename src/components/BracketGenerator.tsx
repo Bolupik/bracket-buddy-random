@@ -2,12 +2,13 @@ import { useState, useRef, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash2, Shuffle, Upload, User, Award } from "lucide-react";
+import { Trash2, Shuffle, Upload, User, Award, BarChart3 } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { MatchCard } from "./MatchCard";
 import { useNavigate } from "react-router-dom";
 import stackingBanner from "@/assets/stacking-banner.png";
+import { Leaderboard } from "./Leaderboard";
 
 interface Participant {
   name: string;
@@ -34,6 +35,7 @@ export const BracketGenerator = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [tournamentCreated, setTournamentCreated] = useState(false);
   const [pokemonImages, setPokemonImages] = useState<string[]>([]);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
@@ -406,10 +408,21 @@ export const BracketGenerator = () => {
         {matchups.length > 0 && (
           <div className="space-y-6 animate-fade-in">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <h2 className="text-3xl font-bold text-foreground">
-                Tournament Matchups
-              </h2>
-              {isAdmin && (
+              <div className="flex items-center gap-3">
+                <h2 className="text-3xl font-bold text-foreground">
+                  {showLeaderboard ? "Leaderboard" : "Tournament Matchups"}
+                </h2>
+                <Button
+                  onClick={() => setShowLeaderboard(!showLeaderboard)}
+                  variant="outline"
+                  size="sm"
+                  className="border-primary/40 hover:bg-primary/10"
+                >
+                  <BarChart3 className="w-4 h-4 mr-2" />
+                  {showLeaderboard ? "View Matchups" : "View Leaderboard"}
+                </Button>
+              </div>
+              {isAdmin && !showLeaderboard && (
                 <div className="flex gap-2">
                   <Button onClick={generateTournament} variant="outline" size="sm" className="border-primary/40 hover:bg-primary/10">
                     <Shuffle className="w-4 h-4 mr-2" />
@@ -425,7 +438,10 @@ export const BracketGenerator = () => {
               )}
             </div>
             
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {showLeaderboard ? (
+              <Leaderboard matchups={matchups} />
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {matchups.map((matchup, index) => (
                 <Card
                   key={index}
@@ -464,8 +480,9 @@ export const BracketGenerator = () => {
                     ))}
                   </div>
                 </Card>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>
