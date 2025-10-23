@@ -11,9 +11,14 @@ interface Participant {
   image?: string;
 }
 
+interface Match {
+  opponent: Participant;
+  completed: boolean;
+}
+
 interface MatchUp {
   participant: Participant;
-  opponents: Participant[];
+  matches: Match[];
 }
 
 export const BracketGenerator = () => {
@@ -41,13 +46,19 @@ export const BracketGenerator = () => {
   const addParticipant = () => {
     const name = currentName.trim();
     if (name && !participants.find(p => p.name === name)) {
-      setParticipants([...participants, { name, image: currentImage }]);
+      const newParticipants = [...participants, { name, image: currentImage }];
+      setParticipants(newParticipants);
       setCurrentName("");
       setCurrentImage(undefined);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
       toast.success(`${name} added to the tournament!`);
+      
+      // Regenerate tournament if it was already generated
+      if (matchups.length > 0) {
+        toast.info("Tournament will be regenerated with the new participant");
+      }
     } else if (participants.find(p => p.name === name)) {
       toast.error("This name is already in the tournament!");
     }
@@ -66,6 +77,33 @@ export const BracketGenerator = () => {
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
     return shuffled;
+  };
+
+  const toggleMatchComplete = (participantName: string, opponentName: string) => {
+    setMatchups(matchups.map(matchup => {
+      if (matchup.participant.name === participantName) {
+        return {
+          ...matchup,
+          matches: matchup.matches.map(match =>
+            match.opponent.name === opponentName
+              ? { ...match, completed: !match.completed }
+              : match
+          ),
+        };
+      }
+      // Also toggle for the opponent's matchup
+      if (matchup.participant.name === opponentName) {
+        return {
+          ...matchup,
+          matches: matchup.matches.map(match =>
+            match.opponent.name === participantName
+              ? { ...match, completed: !match.completed }
+              : match
+          ),
+        };
+      }
+      return matchup;
+    }));
   };
 
   const generateTournament = () => {
@@ -121,9 +159,10 @@ export const BracketGenerator = () => {
     // Build the final matchup structure
     const newMatchups: MatchUp[] = participants.map(participant => ({
       participant,
-      opponents: Array.from(participantOpponents[participant.name])
+      matches: Array.from(participantOpponents[participant.name])
         .map(name => participants.find(p => p.name === name)!)
-        .filter(Boolean),
+        .filter(Boolean)
+        .map(opponent => ({ opponent, completed: false })),
     }));
 
     setMatchups(newMatchups);
@@ -233,9 +272,15 @@ export const BracketGenerator = () => {
         {/* Tournament Display */}
         {matchups.length > 0 && (
           <div className="space-y-6 animate-fade-in">
-            <h2 className="text-3xl font-bold text-center text-foreground">
-              Tournament Matchups
-            </h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-3xl font-bold text-foreground">
+                Tournament Matchups
+              </h2>
+              <Button onClick={generateTournament} variant="outline" size="sm">
+                <Shuffle className="w-4 h-4 mr-2" />
+                Regenerate
+              </Button>
+            </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {matchups.map((matchup, index) => (
@@ -263,22 +308,33 @@ export const BracketGenerator = () => {
                   {/* Opponents */}
                   <div className="space-y-2">
                     <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                      Opponents
+                      Matches ({matchup.matches.filter(m => m.completed).length}/3 completed)
                     </p>
-                    {matchup.opponents.map((opponent, oppIndex) => (
+                    {matchup.matches.map((match, matchIndex) => (
                       <div
-                        key={oppIndex}
-                        className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors"
+                        key={matchIndex}
+                        className={`flex items-center gap-3 p-3 rounded-lg transition-all ${
+                          match.completed
+                            ? 'bg-primary/10 border-2 border-primary/30'
+                            : 'bg-muted/50 border-2 border-transparent hover:bg-muted'
+                        }`}
                       >
                         <Avatar className="w-10 h-10 border border-border">
-                          <AvatarImage src={opponent.image} alt={opponent.name} />
+                          <AvatarImage src={match.opponent.image} alt={match.opponent.name} />
                           <AvatarFallback className="bg-secondary text-secondary-foreground font-semibold">
                             <User className="w-5 h-5" />
                           </AvatarFallback>
                         </Avatar>
-                        <span className="font-semibold text-foreground">
-                          {opponent.name}
+                        <span className={`font-semibold flex-1 ${match.completed ? 'text-primary' : 'text-foreground'}`}>
+                          {match.opponent.name}
                         </span>
+                        <Button
+                          onClick={() => toggleMatchComplete(matchup.participant.name, match.opponent.name)}
+                          variant={match.completed ? "default" : "outline"}
+                          size="sm"
+                        >
+                          {match.completed ? "✓ Done" : "Mark Complete"}
+                        </Button>
                       </div>
                     ))}
                   </div>
