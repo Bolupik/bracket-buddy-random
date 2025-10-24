@@ -9,6 +9,8 @@ import { MatchCard } from "./MatchCard";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import stackingBanner from "@/assets/stacking-banner.png";
 import { Leaderboard } from "./Leaderboard";
+import { Navigation } from "./Navigation";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Participant {
   name: string;
@@ -71,23 +73,36 @@ export const BracketGenerator = () => {
     }
   }, []);
 
-  // Load tournament from URL parameter
+  // Load tournament from URL parameter (from database)
   useEffect(() => {
     const id = searchParams.get('id');
     if (id) {
-      const savedTournament = localStorage.getItem(`tournament_${id}`);
-      if (savedTournament) {
-        const data = JSON.parse(savedTournament);
-        setMatchups(data.matchups);
-        setParticipants(data.participants);
-        setTournamentCreated(true);
-        setTournamentId(id);
-        toast.success("Tournament loaded!");
-      } else {
-        toast.error("Tournament not found");
-      }
+      loadTournamentFromDatabase(id);
     }
   }, [searchParams]);
+
+  const loadTournamentFromDatabase = async (id: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('tournaments')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        setMatchups(data.matchups as unknown as MatchUp[]);
+        setParticipants(data.participants as unknown as Participant[]);
+        setTournamentCreated(true);
+        setTournamentId(id);
+        toast.success(`Tournament "${data.name}" loaded!`);
+      }
+    } catch (error) {
+      console.error('Error loading tournament:', error);
+      toast.error("Tournament not found");
+    }
+  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -242,15 +257,36 @@ export const BracketGenerator = () => {
     setTournamentCreated(true);
     setIsAdmin(true);
     
-    // Generate and save tournament with unique ID
-    const id = Date.now().toString(36) + Math.random().toString(36).substring(2);
-    setTournamentId(id);
-    localStorage.setItem(`tournament_${id}`, JSON.stringify({
-      matchups: newMatchups,
-      participants
-    }));
+    // Save tournament to database
+    saveTournamentToDatabase(newMatchups);
     
     toast.success("Tournament matchups generated! Each player has exactly 3 fights.");
+  };
+
+  const saveTournamentToDatabase = async (tournamentMatchups: MatchUp[]) => {
+    try {
+      const tournamentName = `Tournament ${new Date().toLocaleDateString()}`;
+      
+      const { data, error } = await supabase
+        .from('tournaments')
+        .insert([{
+          name: tournamentName,
+          participants: participants as any,
+          matchups: tournamentMatchups as any
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        setTournamentId(data.id);
+        toast.success("Tournament saved to database!");
+      }
+    } catch (error) {
+      console.error('Error saving tournament:', error);
+      toast.error("Failed to save tournament");
+    }
   };
 
   const shareTournament = () => {
@@ -261,7 +297,7 @@ export const BracketGenerator = () => {
     
     const url = `${window.location.origin}/?id=${tournamentId}`;
     navigator.clipboard.writeText(url);
-    toast.success("Tournament link copied to clipboard!");
+    toast.success("Shareable tournament link copied to clipboard! 🔗");
   };
 
   const clearAllResults = () => {
@@ -287,6 +323,8 @@ export const BracketGenerator = () => {
 
   return (
     <div className="min-h-screen bg-[var(--gradient-dark)] p-4 md:p-8 relative overflow-hidden">
+      <Navigation />
+      
       {/* Pokemon Background */}
       <div className="fixed inset-0 pointer-events-none opacity-10 z-0">
         {pokemonImages.map((img, index) => (
@@ -514,7 +552,7 @@ export const BracketGenerator = () => {
                   {/* Opponents */}
                   <div className="space-y-3">
                     <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                      Matches ({matchup.matches.filter(m => m.completed).length}/3 completed)
+                      Matches ({matchup.matches.filter(m => m.completed).length}/{matchup.matches.length} completed)
                     </p>
                     {matchup.matches.map((match, matchIndex) => (
                       <MatchCard

@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import stackingBanner from "@/assets/stacking-banner.png";
+import { Navigation } from "@/components/Navigation";
 
 interface Participant {
   name: string;
@@ -57,6 +58,8 @@ export default function WheelPage() {
 
   return (
     <div className="min-h-screen bg-[var(--gradient-dark)] p-4 md:p-8 relative overflow-hidden">
+      <Navigation />
+      
       {/* Pokemon Background */}
       <div className="fixed inset-0 pointer-events-none opacity-10 z-0">
         {pokemonImages.map((img, index) => (
@@ -76,7 +79,7 @@ export default function WheelPage() {
         ))}
       </div>
 
-      <div className="max-w-6xl mx-auto space-y-8 relative z-10">
+      <div className="max-w-6xl mx-auto pt-24 space-y-8 relative z-10">
         {/* Banner Image */}
         <div className="w-full animate-fade-in">
           <img 
@@ -88,15 +91,6 @@ export default function WheelPage() {
 
         {/* Header */}
         <div className="text-center space-y-4 animate-fade-in relative">
-          <Button
-            onClick={() => navigate("/")}
-            variant="outline"
-            className="absolute left-0 top-0"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Tournament
-          </Button>
-
           <div className="absolute inset-0 bg-[var(--gradient-primary)] opacity-10 blur-3xl -z-10"></div>
           <div className="relative">
             <h1 className="text-6xl md:text-8xl font-black tracking-tighter">
