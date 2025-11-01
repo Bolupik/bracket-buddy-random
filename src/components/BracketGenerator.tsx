@@ -130,15 +130,67 @@ export const BracketGenerator = () => {
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
-      toast.success(`${name} added to the tournament!`);
       
-      // Regenerate tournament if it was already generated
+      // If tournament is already generated, add the participant to it
       if (matchups.length > 0) {
-        toast.info("Tournament will be regenerated with the new participant");
+        addParticipantToTournament({ name, image: currentImage });
+      } else {
+        toast.success(`${name} added to the tournament!`);
       }
     } else if (participants.find(p => p.name === name)) {
       toast.error("This name is already in the tournament!");
     }
+  };
+
+  const addParticipantToTournament = (newParticipant: Participant) => {
+    // Find participants who have less than 3 matches
+    const participantsWithAvailableSlots = matchups
+      .filter(m => m.matches.length < 3)
+      .map(m => m.participant);
+    
+    // If everyone has 3 matches, pick random participants
+    let opponents: Participant[];
+    if (participantsWithAvailableSlots.length >= 3) {
+      opponents = shuffleArray(participantsWithAvailableSlots).slice(0, 3);
+    } else {
+      // Pick random participants, prioritizing those with fewer matches
+      opponents = shuffleArray([...participants]).slice(0, 3);
+    }
+    
+    // Create matches for the new participant
+    const newParticipantMatches: Match[] = opponents.map(opponent => ({
+      opponent,
+      completed: false,
+      score: undefined,
+      result: undefined as 'win' | 'loss' | 'draw' | undefined
+    }));
+    
+    // Add the new participant's matchup
+    const updatedMatchups: MatchUp[] = [
+      ...matchups.map(matchup => {
+        // Add reciprocal match if this participant is facing the new one
+        if (opponents.some(opp => opp.name === matchup.participant.name)) {
+          return {
+            ...matchup,
+            matches: [...matchup.matches, {
+              opponent: newParticipant,
+              completed: false,
+              score: undefined,
+              result: undefined as 'win' | 'loss' | 'draw' | undefined
+            }]
+          };
+        }
+        return matchup;
+      }),
+      {
+        participant: newParticipant,
+        matches: newParticipantMatches
+      }
+    ];
+    
+    setMatchups(updatedMatchups);
+    updateTournamentInDatabase(updatedMatchups);
+    toast.success(`${newParticipant.name} added to the tournament with 3 matches!`);
   };
 
   const removeParticipant = (index: number) => {
@@ -164,9 +216,9 @@ export const BracketGenerator = () => {
     score: string,
     result: 'win' | 'loss' | 'draw'
   ) => {
-    const oppositeResult = result === 'win' ? 'loss' : result === 'loss' ? 'win' : 'draw';
+    const oppositeResult: 'win' | 'loss' | 'draw' = result === 'win' ? 'loss' : result === 'loss' ? 'win' : 'draw';
     
-    setMatchups(matchups.map(matchup => {
+    const updatedMatchups: MatchUp[] = matchups.map(matchup => {
       if (matchup.participant.name === participantName) {
         return {
           ...matchup,
@@ -189,8 +241,10 @@ export const BracketGenerator = () => {
         };
       }
       return matchup;
-    }));
+    });
     
+    setMatchups(updatedMatchups);
+    updateTournamentInDatabase(updatedMatchups);
     toast.success(`Match result recorded: ${score}`);
   };
 
@@ -289,6 +343,25 @@ export const BracketGenerator = () => {
     }
   };
 
+  const updateTournamentInDatabase = async (updatedMatchups: MatchUp[]) => {
+    if (!tournamentId) return;
+    
+    try {
+      const { error } = await supabase
+        .from('tournaments')
+        .update({
+          matchups: updatedMatchups as any,
+          participants: participants as any
+        })
+        .eq('id', tournamentId);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error updating tournament:', error);
+      toast.error("Failed to update tournament");
+    }
+  };
+
   const shareTournament = () => {
     if (!tournamentId) {
       toast.error("Please generate a tournament first");
@@ -301,7 +374,7 @@ export const BracketGenerator = () => {
   };
 
   const clearAllResults = () => {
-    setMatchups(matchups.map(matchup => ({
+    const clearedMatchups = matchups.map(matchup => ({
       ...matchup,
       matches: matchup.matches.map(match => ({
         ...match,
@@ -309,7 +382,9 @@ export const BracketGenerator = () => {
         score: undefined,
         result: undefined
       }))
-    })));
+    }));
+    setMatchups(clearedMatchups);
+    updateTournamentInDatabase(clearedMatchups);
     toast.info("All match results cleared");
   };
 
@@ -395,7 +470,7 @@ export const BracketGenerator = () => {
           </div>
         </div>
 
-        {/* Input Section */}
+        {/* Input Section - Always visible for adding participants */}
         <Card className="p-6 shadow-[var(--shadow-intense)] animate-scale-in bg-card/95 backdrop-blur-sm border-2 border-primary/20">
           <div className="space-y-4">
             <div className="flex flex-col md:flex-row gap-4">
@@ -434,11 +509,11 @@ export const BracketGenerator = () => {
               </div>
 
               <Button onClick={addParticipant} size="lg" className="md:w-32 h-auto">
-                Add Player
+                {matchups.length > 0 ? "Add to Tournament" : "Add Player"}
               </Button>
             </div>
 
-            {participants.length > 0 && (
+            {participants.length > 0 && !tournamentCreated && (
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 animate-fade-in">
                   {participants.map((participant, index) => (
@@ -556,11 +631,11 @@ export const BracketGenerator = () => {
                     </p>
                     {matchup.matches.map((match, matchIndex) => (
                       <MatchCard
-                        key={matchIndex}
+                      key={matchIndex}
                         match={match}
                         participantName={matchup.participant.name}
                         onUpdateResult={updateMatchResult}
-                        isAdmin={isAdmin}
+                        isAdmin={true}
                       />
                     ))}
                   </div>
