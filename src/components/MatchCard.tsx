@@ -39,14 +39,14 @@ export const MatchCard = ({ match, participantName, onUpdateResult, isAdmin }: M
     if (!match.result) return null;
     
     const badges = {
-      win: { text: 'WIN', color: 'bg-green-500/20 text-green-500 border-green-500/30' },
-      loss: { text: 'LOSS', color: 'bg-red-500/20 text-red-500 border-red-500/30' },
-      draw: { text: 'DRAW', color: 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30' }
+      win: { text: '🏆 WON!', emoji: '🏆', color: 'bg-green-500/30 text-green-600 border-green-500/50' },
+      loss: { text: '😢 Lost', emoji: '😢', color: 'bg-red-500/30 text-red-600 border-red-500/50' },
+      draw: { text: '🤝 Draw', emoji: '🤝', color: 'bg-yellow-500/30 text-yellow-600 border-yellow-500/50' }
     };
     
     const badge = badges[match.result];
     return (
-      <span className={`px-2 py-1 text-xs font-bold rounded border ${badge.color}`}>
+      <span className={`px-4 py-2 text-base font-bold rounded-lg border-2 ${badge.color}`}>
         {badge.text}
       </span>
     );
@@ -54,19 +54,19 @@ export const MatchCard = ({ match, participantName, onUpdateResult, isAdmin }: M
 
   if (match.completed && !isEditing) {
     return (
-      <div className="flex items-center gap-3 p-4 rounded-lg transition-all bg-primary/10 border-2 border-primary/30 shadow-sm hover:shadow-[var(--shadow-glow)]">
-        <Avatar className="w-10 h-10 border border-border">
+      <div className="flex items-center gap-4 p-5 rounded-xl transition-all bg-primary/10 border-3 border-primary/30 shadow-lg hover:shadow-xl hover:scale-[1.02]">
+        <Avatar className="w-14 h-14 border-3 border-primary/40">
           <AvatarImage src={match.opponent.image} alt={match.opponent.name} />
-          <AvatarFallback className="bg-secondary text-secondary-foreground font-semibold">
-            <User className="w-5 h-5" />
+          <AvatarFallback className="bg-secondary text-secondary-foreground font-semibold text-lg">
+            {match.opponent.name[0].toUpperCase()}
           </AvatarFallback>
         </Avatar>
         <div className="flex-1">
-          <span className="font-semibold text-primary block">
+          <span className="font-bold text-lg text-primary block">
             {match.opponent.name}
           </span>
           {match.score && (
-            <span className="text-sm text-muted-foreground">
+            <span className="text-base text-foreground/80 font-semibold">
               Score: {match.score}
             </span>
           )}
@@ -76,9 +76,10 @@ export const MatchCard = ({ match, participantName, onUpdateResult, isAdmin }: M
           <Button
             onClick={() => setIsEditing(true)}
             variant="ghost"
-            size="sm"
+            size="lg"
+            className="h-12"
           >
-            Edit
+            ✏️ Edit
           </Button>
         )}
       </div>
@@ -87,15 +88,15 @@ export const MatchCard = ({ match, participantName, onUpdateResult, isAdmin }: M
 
   if (isEditing || !match.completed) {
     return (
-      <div className="p-4 rounded-lg bg-card/60 backdrop-blur-sm border-2 border-primary/20 space-y-3 shadow-sm">
-        <div className="flex items-center gap-3">
-          <Avatar className="w-10 h-10 border border-border">
+      <div className="p-5 rounded-xl bg-card/80 backdrop-blur-sm border-3 border-primary/30 space-y-4 shadow-lg">
+        <div className="flex items-center gap-4">
+          <Avatar className="w-14 h-14 border-3 border-primary/40">
             <AvatarImage src={match.opponent.image} alt={match.opponent.name} />
-            <AvatarFallback className="bg-secondary text-secondary-foreground font-semibold">
-              <User className="w-5 h-5" />
+            <AvatarFallback className="bg-secondary text-secondary-foreground font-semibold text-lg">
+              {match.opponent.name[0].toUpperCase()}
             </AvatarFallback>
           </Avatar>
-          <span className="font-semibold text-foreground flex-1">
+          <span className="font-bold text-xl text-foreground flex-1">
             {match.opponent.name}
           </span>
           {isEditing && (
@@ -105,48 +106,51 @@ export const MatchCard = ({ match, participantName, onUpdateResult, isAdmin }: M
                 setScore(match.score || "");
               }}
               variant="ghost"
-              size="sm"
+              size="lg"
+              className="h-12 w-12"
             >
-              <X className="w-4 h-4" />
+              <X className="w-6 h-6" />
             </Button>
           )}
         </div>
         
-        <div className="space-y-2">
+        <div className="space-y-3">
           <Input
-            placeholder="Enter score (e.g., 3-1, 21-19)"
+            placeholder="Enter score (like 3-1 or 21-19) ⚽"
             value={score}
             onChange={(e) => setScore(e.target.value)}
-            className="text-sm"
+            className="text-lg h-14 text-center font-semibold border-2"
           />
           
-          <div className="flex gap-2">
+          <div className="grid grid-cols-3 gap-3">
             <Button
               onClick={() => handleResult('win')}
               variant="outline"
-              size="sm"
-              className="flex-1 bg-green-500/10 hover:bg-green-500/20 border-green-500/30 text-green-600"
+              size="lg"
+              className="flex-col h-20 bg-green-500/20 hover:bg-green-500/30 border-2 border-green-500/50 text-green-700 font-bold"
               disabled={!score.trim()}
             >
-              <Trophy className="w-4 h-4 mr-1" />
-              Win
+              <Trophy className="w-6 h-6 mb-1" />
+              🏆 Win!
             </Button>
             <Button
               onClick={() => handleResult('draw')}
               variant="outline"
-              size="sm"
-              className="flex-1 bg-yellow-500/10 hover:bg-yellow-500/20 border-yellow-500/30 text-yellow-600"
+              size="lg"
+              className="flex-col h-20 bg-yellow-500/20 hover:bg-yellow-500/30 border-2 border-yellow-500/50 text-yellow-700 font-bold"
               disabled={!score.trim()}
             >
+              <span className="text-2xl mb-1">🤝</span>
               Draw
             </Button>
             <Button
               onClick={() => handleResult('loss')}
               variant="outline"
-              size="sm"
-              className="flex-1 bg-red-500/10 hover:bg-red-500/20 border-red-500/30 text-red-600"
+              size="lg"
+              className="flex-col h-20 bg-red-500/20 hover:bg-red-500/30 border-2 border-red-500/50 text-red-700 font-bold"
               disabled={!score.trim()}
             >
+              <span className="text-2xl mb-1">😢</span>
               Loss
             </Button>
           </div>

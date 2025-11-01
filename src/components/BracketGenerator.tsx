@@ -492,134 +492,164 @@ export const BracketGenerator = () => {
         </div>
 
         {/* Header */}
-        <div className="text-center space-y-4 animate-fade-in relative">
+        <div className="text-center space-y-6 animate-fade-in relative">
           <div className="absolute inset-0 bg-[var(--gradient-primary)] opacity-10 blur-3xl -z-10"></div>
           <div className="relative">
-            <h1 className="text-6xl md:text-8xl font-black tracking-tighter">
+            <h1 className="text-5xl md:text-7xl font-black tracking-tight">
               <span className="bg-[var(--gradient-primary)] bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(34,197,94,0.3)]">
-                STACKINGDAO
+                🎮 Tournament Time! 🎮
               </span>
             </h1>
-            <div className="flex items-center justify-center gap-3 mt-2">
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary to-transparent"></div>
-              <p className="text-xl md:text-2xl font-bold text-primary/90 uppercase tracking-widest">
-                Pokemon Tournament Draw
-              </p>
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary to-transparent"></div>
-            </div>
+            <p className="text-2xl md:text-3xl font-bold text-foreground mt-4">
+              Create Your Pokemon Battle!
+            </p>
           </div>
-          <p className="text-lg text-foreground/70 font-medium">
-            Each participant gets 3 random opponents
+          <p className="text-xl text-foreground/80 font-medium max-w-2xl mx-auto">
+            Everyone gets 3 fun matches! Add your friends and let's start! 🌟
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-4">
+          
+          {/* Status badges */}
+          <div className="flex flex-wrap items-center justify-center gap-3">
             {userName && tournamentId && (
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/20 border-2 border-accent/40 backdrop-blur-sm">
-                <User className="w-4 h-4 text-accent" />
-                <span className="text-sm font-bold text-accent">{userName}</span>
-              </div>
-            )}
-            {isAdmin && (
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 border-2 border-primary/40 backdrop-blur-sm">
-                <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
-                <span className="text-sm font-bold text-primary">ADMIN MODE</span>
+              <div className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-accent/30 border-2 border-accent shadow-lg">
+                <User className="w-5 h-5 text-accent" />
+                <span className="text-base font-bold text-accent">{userName}</span>
               </div>
             )}
             {participants.length > 0 && (
-              <Button
-                onClick={() => navigate("/wheel")}
-                variant="gradient"
-                size="lg"
-                className="gap-2"
-              >
-                <Award className="w-5 h-5" />
-                Winner Selection Wheel
-              </Button>
+              <div className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-primary/30 border-2 border-primary shadow-lg">
+                <User className="w-5 h-5 text-primary" />
+                <span className="text-base font-bold text-primary">{participants.length} Players</span>
+              </div>
             )}
           </div>
         </div>
 
-        {/* Input Section - Always visible for adding participants */}
-        <Card className="p-6 shadow-[var(--shadow-intense)] animate-scale-in bg-card/95 backdrop-blur-sm border-2 border-primary/20">
-          <div className="space-y-4">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1 space-y-4">
-                <Input
-                  placeholder="Enter participant name..."
-                  value={currentName}
-                  onChange={(e) => setCurrentName(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && addParticipant()}
-                  className="text-lg"
-                />
-                
-                <div className="flex items-center gap-4">
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleImageUpload}
-                    accept="image/*"
-                    className="hidden"
-                  />
-                  <Button
-                    onClick={() => fileInputRef.current?.click()}
-                    variant="outline"
-                    className="flex-1"
-                  >
-                    <Upload className="w-4 h-4 mr-2" />
-                    {currentImage ? "Change Image" : "Upload Image"}
-                  </Button>
-                  
-                  {currentImage && (
-                    <Avatar className="w-16 h-16 border-2 border-primary">
-                      <AvatarImage src={currentImage} alt="Preview" />
-                    </Avatar>
-                  )}
-                </div>
-              </div>
+        {/* Step-by-step guidance */}
+        {!tournamentCreated && participants.length === 0 && (
+          <Card className="p-8 bg-gradient-to-br from-primary/10 to-accent/10 border-2 border-primary/30 shadow-xl animate-scale-in">
+            <div className="text-center space-y-4">
+              <div className="text-6xl">👥</div>
+              <h2 className="text-3xl font-bold">Step 1: Add Players!</h2>
+              <p className="text-xl text-foreground/70">Type a name and click "Add Player" (Need at least 4 players)</p>
+            </div>
+          </Card>
+        )}
 
-              <Button onClick={addParticipant} size="lg" className="md:w-32 h-auto">
-                {matchups.length > 0 ? "Add to Tournament" : "Add Player"}
+        {/* Input Section - Simplified */}
+        <Card className="p-8 shadow-2xl animate-scale-in bg-card/95 backdrop-blur-sm border-3 border-primary/30">
+          <div className="space-y-6">
+            <div className="flex flex-col gap-4">
+              <Input
+                placeholder="Type a player name here... 😊"
+                value={currentName}
+                onChange={(e) => setCurrentName(e.target.value)}
+                onKeyPress={(e) => e.key === "Enter" && addParticipant()}
+                className="text-xl h-16 text-center font-semibold border-2"
+              />
+              
+              <div className="flex items-center gap-4">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleImageUpload}
+                  accept="image/*"
+                  className="hidden"
+                />
+                <Button
+                  onClick={() => fileInputRef.current?.click()}
+                  variant="outline"
+                  size="lg"
+                  className="flex-1 h-16 text-lg border-2"
+                >
+                  <Upload className="w-6 h-6 mr-2" />
+                  {currentImage ? "📷 Change Photo" : "📷 Add Photo (Optional)"}
+                </Button>
+                
+                {currentImage && (
+                  <Avatar className="w-20 h-20 border-4 border-primary shadow-lg">
+                    <AvatarImage src={currentImage} alt="Preview" />
+                  </Avatar>
+                )}
+              </div>
+              
+              <Button
+                onClick={addParticipant}
+                disabled={!currentName}
+                size="lg"
+                className="w-full h-16 text-xl font-bold"
+              >
+                <User className="w-6 h-6 mr-3" />
+                {matchups.length > 0 ? "➕ Add to Tournament" : "➕ Add Player"}
               </Button>
             </div>
 
             {participants.length > 0 && !tournamentCreated && (
               <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 animate-fade-in">
-                  {participants.map((participant, index) => (
-                  <Card
-                    key={index}
-                    className="p-4 flex items-center gap-3 group hover:shadow-[var(--shadow-glow)] transition-all hover:scale-[1.02] animate-slide-in bg-card/80 backdrop-blur-sm border-primary/20"
-                    style={{ animationDelay: `${index * 0.05}s` }}
-                  >
-                      <Avatar className="w-12 h-12 border-2 border-primary/20">
-                        <AvatarImage src={participant.image} alt={participant.name} />
-                        <AvatarFallback className="bg-primary/10 text-primary font-bold">
-                          <User className="w-6 h-6" />
-                        </AvatarFallback>
-                      </Avatar>
-                      
-                      <span className="font-semibold flex-1 text-foreground">
-                        {participant.name}
-                      </span>
-                      
-                      <button
-                        onClick={() => removeParticipant(index)}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity p-2 hover:bg-destructive/10 rounded-md"
+                <div className="pt-4 border-t-2 border-primary/20">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-2xl font-bold flex items-center gap-2">
+                      <span className="text-3xl">👥</span>
+                      Players ({participants.length})
+                    </h3>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {participants.map((participant, index) => (
+                      <Card
+                        key={index}
+                        className="p-5 hover:shadow-xl transition-all duration-200 border-2 border-primary/30 bg-gradient-to-br from-card/80 to-primary/5"
                       >
-                        <Trash2 className="w-4 h-4 text-destructive" />
-                      </button>
-                    </Card>
-                  ))}
+                        <div className="flex items-center gap-4">
+                          <Avatar className="h-16 w-16 border-3 border-primary/40 shadow-lg">
+                            <AvatarImage src={participant.image} alt={participant.name} />
+                            <AvatarFallback className="bg-primary/30 text-primary font-bold text-xl">
+                              {participant.name[0].toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1">
+                            <p className="font-bold text-lg">
+                              {participant.name}
+                            </p>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="lg"
+                            onClick={() => removeParticipant(index)}
+                            className="hover:bg-destructive/20 hover:text-destructive h-12 w-12"
+                          >
+                            <Trash2 className="w-6 h-6" />
+                          </Button>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
                 </div>
 
-                <Button
-                  onClick={generateTournament}
-                  variant="gradient"
-                  size="lg"
-                  className="w-full text-lg font-bold"
-                >
-                  <Shuffle className="w-5 h-5" />
-                  Generate Tournament
-                </Button>
+                {participants.length >= 4 ? (
+                  <Card className="p-8 bg-gradient-to-br from-primary/20 to-accent/20 border-3 border-primary shadow-xl">
+                    <div className="text-center space-y-4">
+                      <div className="text-6xl">🎯</div>
+                      <h2 className="text-3xl font-bold">Ready to Create Matches!</h2>
+                      <p className="text-xl text-foreground/70">Click to make the tournament!</p>
+                      <Button
+                        onClick={generateTournament}
+                        size="lg"
+                        className="text-2xl px-12 py-8 shadow-2xl h-auto font-bold"
+                      >
+                        <Shuffle className="w-8 h-8 mr-3" />
+                        🎲 Create Tournament! 🎲
+                      </Button>
+                    </div>
+                  </Card>
+                ) : (
+                  <Card className="p-8 text-center border-3 border-dashed border-primary/40 bg-card/70">
+                    <div className="text-5xl mb-4">👋</div>
+                    <p className="text-2xl font-semibold text-foreground">
+                      Need {4 - participants.length} more player{4 - participants.length !== 1 ? 's' : ''} to start! 
+                    </p>
+                    <p className="text-xl text-muted-foreground mt-2">Keep adding friends! 🌟</p>
+                  </Card>
+                )}
               </>
             )}
           </div>
@@ -628,39 +658,59 @@ export const BracketGenerator = () => {
         {/* Tournament Display */}
         {matchups.length > 0 && (
           <div className="space-y-6 animate-fade-in">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <h2 className="text-3xl font-bold text-foreground">
-                  {showLeaderboard ? "Leaderboard" : "Tournament Matchups"}
+            <Card className="p-6 bg-gradient-to-r from-primary/20 to-accent/20 border-2 border-primary/30 shadow-xl">
+              <div className="text-center space-y-3">
+                <div className="text-5xl">⚔️</div>
+                <h2 className="text-4xl font-black">
+                  Battle Matches!
                 </h2>
-                <Button
-                  onClick={() => setShowLeaderboard(!showLeaderboard)}
-                  variant="dark"
-                  size="sm"
-                >
-                  <BarChart3 className="w-4 h-4 mr-2" />
-                  {showLeaderboard ? "View Matchups" : "View Leaderboard"}
-                </Button>
-                <Button
-                  onClick={shareTournament}
-                  variant="dark"
-                  size="sm"
-                >
-                  <Share2 className="w-4 h-4 mr-2" />
-                  Share
-                </Button>
+                <div className="inline-flex items-center gap-3 px-6 py-3 bg-card/80 rounded-full border-2 border-primary/40">
+                  <span className="text-2xl">✅</span>
+                  <p className="text-xl font-bold">
+                    {matchups.reduce((acc, m) => acc + m.matches.filter(match => match.completed).length, 0)} / {matchups.reduce((acc, m) => acc + m.matches.length, 0)} Matches Done
+                  </p>
+                </div>
               </div>
+            </Card>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <Button
+                onClick={shareTournament}
+                size="lg"
+                className="h-20 text-lg font-bold"
+              >
+                <Share2 className="w-6 h-6 mr-2" />
+                🔗 Share Link
+              </Button>
+              <Button
+                onClick={() => navigate("/wheel")}
+                size="lg"
+                className="h-20 text-lg font-bold"
+              >
+                <Award className="w-6 h-6 mr-2" />
+                🎡 Pick Winner
+              </Button>
+              <Button
+                onClick={() => setShowLeaderboard(!showLeaderboard)}
+                variant="outline"
+                size="lg"
+                className="h-20 text-lg font-bold border-2"
+              >
+                <BarChart3 className="w-6 h-6 mr-2" />
+                {showLeaderboard ? "📊 Hide Scores" : "📊 Show Scores"}
+              </Button>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               {isAdmin && !showLeaderboard && (
-                <div className="flex gap-2">
-                  <Button onClick={generateTournament} variant="dark" size="sm">
-                    <Shuffle className="w-4 h-4 mr-2" />
-                    Regenerate
+                <div className="flex gap-3 flex-wrap justify-center w-full">
+                  <Button onClick={clearAllResults} variant="outline" size="lg" className="h-16 border-2">
+                    <Trash2 className="w-5 h-5 mr-2" />
+                    🔄 Clear Results
                   </Button>
-                  <Button onClick={clearAllResults} variant="dark" size="sm">
-                    Clear Results
-                  </Button>
-                  <Button onClick={resetTournament} variant="destructive" size="sm">
-                    Reset All
+                  <Button onClick={resetTournament} variant="destructive" size="lg" className="h-16">
+                    <Shuffle className="w-5 h-5 mr-2" />
+                    ♻️ New Tournament
                   </Button>
                 </div>
               )}
@@ -673,30 +723,33 @@ export const BracketGenerator = () => {
               {matchups.map((matchup, index) => (
                 <Card
                   key={index}
-                  className="p-6 space-y-4 hover:shadow-[var(--shadow-intense)] transition-all animate-scale-in bg-card/90 backdrop-blur-sm border-2 border-primary/20"
+                  className="p-6 space-y-5 hover:shadow-2xl transition-all animate-scale-in bg-gradient-to-br from-card/90 to-primary/5 backdrop-blur-sm border-3 border-primary/30"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   {/* Main Participant */}
-                  <div className="flex items-center gap-4 p-4 bg-primary/10 rounded-lg border-2 border-primary/30 shadow-[var(--shadow-glow)]">
-                    <Avatar className="w-16 h-16 border-2 border-primary">
+                  <div className="flex items-center gap-4 p-5 bg-gradient-to-r from-primary/20 to-accent/20 rounded-xl border-3 border-primary/40 shadow-lg">
+                    <Avatar className="w-20 h-20 border-4 border-primary shadow-md">
                       <AvatarImage src={matchup.participant.image} alt={matchup.participant.name} />
-                      <AvatarFallback className="bg-primary text-primary-foreground font-bold text-lg">
-                        <User className="w-8 h-8" />
+                      <AvatarFallback className="bg-primary text-primary-foreground font-bold text-2xl">
+                        {matchup.participant.name[0].toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="text-sm text-muted-foreground font-medium">Player</p>
-                      <p className="text-xl font-bold text-foreground">
+                      <p className="text-base text-foreground/60 font-semibold">⭐ Player</p>
+                      <p className="text-2xl font-black text-foreground">
                         {matchup.participant.name}
                       </p>
                     </div>
                   </div>
 
                   {/* Opponents */}
-                  <div className="space-y-3">
-                    <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                      Matches ({matchup.matches.filter(m => m.completed).length}/{matchup.matches.length} completed)
-                    </p>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-center gap-2 py-2 px-4 bg-primary/10 rounded-lg border-2 border-primary/30">
+                      <span className="text-2xl">⚔️</span>
+                      <p className="text-lg font-bold text-foreground">
+                        Battles: {matchup.matches.filter(m => m.completed).length}/{matchup.matches.length}
+                      </p>
+                    </div>
                     {matchup.matches.map((match, matchIndex) => (
                       <MatchCard
                       key={matchIndex}
