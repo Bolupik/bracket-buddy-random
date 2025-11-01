@@ -81,6 +81,38 @@ export const BracketGenerator = () => {
     }
   }, [searchParams]);
 
+  // Real-time subscription for tournament updates
+  useEffect(() => {
+    if (!tournamentId) return;
+
+    console.log('Setting up real-time subscription for tournament:', tournamentId);
+    
+    const channel = supabase
+      .channel('tournament-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'tournaments',
+          filter: `id=eq.${tournamentId}`
+        },
+        (payload) => {
+          console.log('Real-time tournament update received:', payload);
+          const updated = payload.new;
+          setMatchups(updated.matchups as unknown as MatchUp[]);
+          setParticipants(updated.participants as unknown as Participant[]);
+          toast.info('Tournament updated by another user');
+        }
+      )
+      .subscribe();
+
+    return () => {
+      console.log('Cleaning up real-time subscription');
+      supabase.removeChannel(channel);
+    };
+  }, [tournamentId]);
+
   const loadTournamentFromDatabase = async (id: string) => {
     try {
       const { data, error } = await supabase
