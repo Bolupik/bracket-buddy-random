@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Trophy, Dices, Home } from "lucide-react";
+import { Trophy, Dices, Home, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const Navigation = () => {
@@ -17,7 +17,18 @@ export const Navigation = () => {
             className="rounded-full transition-all duration-300 hover:scale-105"
           >
             <Home className="w-4 h-4 mr-2" />
-            Tournament
+            View
+          </Button>
+        </Link>
+
+        <Link to="/create">
+          <Button
+            variant={isActive("/create") ? "default" : "ghost"}
+            size="sm"
+            className="rounded-full transition-all duration-300 hover:scale-105"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Create
           </Button>
         </Link>
 
@@ -39,7 +50,7 @@ export const Navigation = () => {
             className="rounded-full transition-all duration-300 hover:scale-105"
           >
             <Trophy className="w-4 h-4 mr-2" />
-            Winner Selection
+            Winner Wheel
           </Button>
         </Link>
       </div>

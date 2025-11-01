@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import WheelPage from "./pages/WheelPage";
 import RandomWheelPage from "./pages/RandomWheelPage";
+import CreateTournamentPage from "./pages/CreateTournamentPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -18,6 +19,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/create" element={<CreateTournamentPage />} />
           <Route path="/wheel" element={<WheelPage />} />
           <Route path="/random-wheel" element={<RandomWheelPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

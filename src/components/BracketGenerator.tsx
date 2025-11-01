@@ -35,7 +35,7 @@ export const BracketGenerator = () => {
   const [currentName, setCurrentName] = useState("");
   const [currentImage, setCurrentImage] = useState<string | undefined>();
   const [matchups, setMatchups] = useState<MatchUp[]>([]);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isCreator, setIsCreator] = useState(false);
   const [tournamentCreated, setTournamentCreated] = useState(false);
   const [pokemonImages, setPokemonImages] = useState<string[]>([]);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
@@ -79,17 +79,26 @@ export const BracketGenerator = () => {
 
   // Load tournament from URL parameter (from database)
   useEffect(() => {
-    const id = searchParams.get('id');
-    if (id) {
-      loadTournamentFromDatabase(id);
+    const tournamentParam = searchParams.get('tournament');
+    if (tournamentParam) {
+      loadTournamentFromDatabase(tournamentParam);
       
-      // Check if user has a saved name for this tournament
-      const savedName = localStorage.getItem(`tournament_${id}_user`);
-      if (savedName) {
-        setUserName(savedName);
+      // Check if user is the creator
+      const creatorId = localStorage.getItem(`tournament_${tournamentParam}_creator`);
+      const savedName = localStorage.getItem(`tournament_${tournamentParam}_name`);
+      
+      if (creatorId) {
+        setIsCreator(true);
+        setUserName(savedName || 'Host');
       } else {
-        // Show join dialog after a short delay to load tournament name
-        setTimeout(() => setShowJoinDialog(true), 500);
+        // Check if user has joined
+        const joinedName = localStorage.getItem(`tournament_${tournamentParam}_user`);
+        if (joinedName) {
+          setUserName(joinedName);
+        } else {
+          // Show join dialog after a short delay to load tournament name
+          setTimeout(() => setShowJoinDialog(true), 500);
+        }
       }
     }
   }, [searchParams]);
@@ -142,6 +151,13 @@ export const BracketGenerator = () => {
         setTournamentName(data.name);
         setTournamentCreated(true);
         setTournamentId(id);
+        
+        // Check if current user is the creator
+        const storedCreatorId = localStorage.getItem(`tournament_${id}_creator`);
+        if (storedCreatorId && data.creator_id === storedCreatorId) {
+          setIsCreator(true);
+        }
+        
         toast.success(`Tournament "${data.name}" loaded!`);
       }
     } catch (error) {
@@ -295,94 +311,18 @@ export const BracketGenerator = () => {
   };
 
   const generateTournament = () => {
-    if (participants.length < 4) {
-      toast.error("Add at least 4 participants to create a tournament!");
-      return;
-    }
-
-    // Track fights for each participant
-    const fightCount: { [name: string]: number } = {};
-    const participantOpponents: { [name: string]: Set<string> } = {};
-    
-    participants.forEach(p => {
-      fightCount[p.name] = 0;
-      participantOpponents[p.name] = new Set();
-    });
-
-    // Shuffle participants for randomness
-    const shuffled = shuffleArray([...participants]);
-    
-    // Create matchups ensuring each participant has exactly 3 fights
-    const attempts = shuffled.length * 10; // Prevent infinite loops
-    let attempt = 0;
-    
-    while (attempt < attempts && Object.values(fightCount).some(count => count < 3)) {
-      attempt++;
-      
-      // Find participants who need more fights
-      const needFights = shuffled.filter(p => fightCount[p.name] < 3);
-      
-      for (let i = 0; i < needFights.length; i++) {
-        const p1 = needFights[i];
-        
-        if (fightCount[p1.name] >= 3) continue;
-        
-        // Find a valid opponent
-        for (let j = i + 1; j < needFights.length; j++) {
-          const p2 = needFights[j];
-          
-          if (fightCount[p2.name] >= 3) continue;
-          if (participantOpponents[p1.name].has(p2.name)) continue;
-          
-          // Create the matchup
-          participantOpponents[p1.name].add(p2.name);
-          participantOpponents[p2.name].add(p1.name);
-          fightCount[p1.name]++;
-          fightCount[p2.name]++;
-          break;
-        }
-      }
-    }
-
-    // Build the final matchup structure
-    const newMatchups: MatchUp[] = participants.map(participant => ({
-      participant,
-      matches: Array.from(participantOpponents[participant.name])
-        .map(name => participants.find(p => p.name === name)!)
-        .filter(Boolean)
-        .map(opponent => ({ opponent, completed: false })),
-    }));
-
-    setMatchups(newMatchups);
-    setTournamentCreated(true);
-    setIsAdmin(true);
-    
-    // Save tournament to database
-    saveTournamentToDatabase(newMatchups);
-    
-    toast.success("Tournament matchups generated! Each player has exactly 3 fights.");
+    // Redirect to create page instead
+    navigate('/create');
+    toast.info("Please use the Create page to start a new tournament");
   };
 
   const saveTournamentToDatabase = async (tournamentMatchups: MatchUp[]) => {
     try {
       const tournamentName = `Tournament ${new Date().toLocaleDateString()}`;
       
-      const { data, error } = await supabase
-        .from('tournaments')
-        .insert([{
-          name: tournamentName,
-          participants: participants as any,
-          matchups: tournamentMatchups as any
-        }])
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      if (data) {
-        setTournamentId(data.id);
-        toast.success("Tournament saved to database!");
-      }
+      // This function is only called from generateTournament which shouldn't be accessible anymore
+      // Tournaments should now be created from the CreateTournamentPage
+      toast.error("Please create tournaments from the Create page");
     } catch (error) {
       console.error('Error saving tournament:', error);
       toast.error("Failed to save tournament");
@@ -410,11 +350,11 @@ export const BracketGenerator = () => {
 
   const shareTournament = () => {
     if (!tournamentId) {
-      toast.error("Please generate a tournament first");
+      toast.error("No tournament to share");
       return;
     }
     
-    const url = `${window.location.origin}/?id=${tournamentId}`;
+    const url = `${window.location.origin}/?tournament=${tournamentId}`;
     navigator.clipboard.writeText(url);
     toast.success("Shareable tournament link copied to clipboard! 🔗");
   };
@@ -435,11 +375,8 @@ export const BracketGenerator = () => {
   };
 
   const resetTournament = () => {
-    setMatchups([]);
-    setParticipants([]);
-    setIsAdmin(false);
-    setTournamentCreated(false);
-    toast.info("Tournament reset");
+    navigate('/create');
+    toast.info("Create a new tournament");
   };
 
   const handleJoinTournament = (name: string) => {
@@ -525,135 +462,118 @@ export const BracketGenerator = () => {
           </div>
         </div>
 
-        {/* Step-by-step guidance */}
-        {!tournamentCreated && participants.length === 0 && (
+        {/* Welcome message for non-creators */}
+        {!tournamentCreated && !isCreator && (
           <Card className="p-8 bg-gradient-to-br from-primary/10 to-accent/10 border-2 border-primary/30 shadow-xl animate-scale-in">
             <div className="text-center space-y-4">
-              <div className="text-6xl">👥</div>
-              <h2 className="text-3xl font-bold">Step 1: Add Players!</h2>
-              <p className="text-xl text-foreground/70">Type a name and click "Add Player" (Need at least 4 players)</p>
+              <div className="text-6xl">🎮</div>
+              <h2 className="text-3xl font-bold">Welcome to Tournament View!</h2>
+              <p className="text-xl text-foreground/70">Use a tournament link to join, or create your own tournament</p>
+              <Button
+                onClick={() => navigate('/create')}
+                size="lg"
+                className="text-xl px-8 py-6 h-auto font-bold mt-4"
+              >
+                ✨ Create New Tournament
+              </Button>
             </div>
           </Card>
         )}
 
-        {/* Input Section - Simplified */}
-        <Card className="p-8 shadow-2xl animate-scale-in bg-card/95 backdrop-blur-sm border-3 border-primary/30">
-          <div className="space-y-6">
-            <div className="flex flex-col gap-4">
-              <Input
-                placeholder="Type a player name here... 😊"
-                value={currentName}
-                onChange={(e) => setCurrentName(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && addParticipant()}
-                className="text-xl h-16 text-center font-semibold border-2"
-              />
-              
-              <div className="flex items-center gap-4">
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleImageUpload}
-                  accept="image/*"
-                  className="hidden"
+        {/* Input Section - Only show for creators */}
+        {isCreator && (
+          <Card className="p-8 shadow-2xl animate-scale-in bg-card/95 backdrop-blur-sm border-3 border-primary/30">
+            <div className="space-y-6">
+              <div className="flex flex-col gap-4">
+                <Input
+                  placeholder="Type a player name here... 😊"
+                  value={currentName}
+                  onChange={(e) => setCurrentName(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && addParticipant()}
+                  className="text-xl h-16 text-center font-semibold border-2"
                 />
-                <Button
-                  onClick={() => fileInputRef.current?.click()}
-                  variant="outline"
-                  size="lg"
-                  className="flex-1 h-16 text-lg border-2"
-                >
-                  <Upload className="w-6 h-6 mr-2" />
-                  {currentImage ? "📷 Change Photo" : "📷 Add Photo (Optional)"}
-                </Button>
                 
-                {currentImage && (
-                  <Avatar className="w-20 h-20 border-4 border-primary shadow-lg">
-                    <AvatarImage src={currentImage} alt="Preview" />
-                  </Avatar>
-                )}
-              </div>
-              
-              <Button
-                onClick={addParticipant}
-                disabled={!currentName}
-                size="lg"
-                className="w-full h-16 text-xl font-bold"
-              >
-                <User className="w-6 h-6 mr-3" />
-                {matchups.length > 0 ? "➕ Add to Tournament" : "➕ Add Player"}
-              </Button>
-            </div>
-
-            {participants.length > 0 && !tournamentCreated && (
-              <>
-                <div className="pt-4 border-t-2 border-primary/20">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-2xl font-bold flex items-center gap-2">
-                      <span className="text-3xl">👥</span>
-                      Players ({participants.length})
-                    </h3>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {participants.map((participant, index) => (
-                      <Card
-                        key={index}
-                        className="p-5 hover:shadow-xl transition-all duration-200 border-2 border-primary/30 bg-gradient-to-br from-card/80 to-primary/5"
-                      >
-                        <div className="flex items-center gap-4">
-                          <Avatar className="h-16 w-16 border-3 border-primary/40 shadow-lg">
-                            <AvatarImage src={participant.image} alt={participant.name} />
-                            <AvatarFallback className="bg-primary/30 text-primary font-bold text-xl">
-                              {participant.name[0].toUpperCase()}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1">
-                            <p className="font-bold text-lg">
-                              {participant.name}
-                            </p>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="lg"
-                            onClick={() => removeParticipant(index)}
-                            className="hover:bg-destructive/20 hover:text-destructive h-12 w-12"
-                          >
-                            <Trash2 className="w-6 h-6" />
-                          </Button>
-                        </div>
-                      </Card>
-                    ))}
-                  </div>
+                <div className="flex items-center gap-4">
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleImageUpload}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                  <Button
+                    onClick={() => fileInputRef.current?.click()}
+                    variant="outline"
+                    size="lg"
+                    className="flex-1 h-16 text-lg border-2"
+                  >
+                    <Upload className="w-6 h-6 mr-2" />
+                    {currentImage ? "📷 Change Photo" : "📷 Add Photo (Optional)"}
+                  </Button>
+                  
+                  {currentImage && (
+                    <Avatar className="w-20 h-20 border-4 border-primary shadow-lg">
+                      <AvatarImage src={currentImage} alt="Preview" />
+                    </Avatar>
+                  )}
                 </div>
+                
+                <Button
+                  onClick={addParticipant}
+                  disabled={!currentName}
+                  size="lg"
+                  className="w-full h-16 text-xl font-bold"
+                >
+                  <User className="w-6 h-6 mr-3" />
+                  {matchups.length > 0 ? "➕ Add to Tournament" : "➕ Add Player"}
+                </Button>
+              </div>
 
-                {participants.length >= 4 ? (
-                  <Card className="p-8 bg-gradient-to-br from-primary/20 to-accent/20 border-3 border-primary shadow-xl">
-                    <div className="text-center space-y-4">
-                      <div className="text-6xl">🎯</div>
-                      <h2 className="text-3xl font-bold">Ready to Create Matches!</h2>
-                      <p className="text-xl text-foreground/70">Click to make the tournament!</p>
-                      <Button
-                        onClick={generateTournament}
-                        size="lg"
-                        className="text-2xl px-12 py-8 shadow-2xl h-auto font-bold"
-                      >
-                        <Shuffle className="w-8 h-8 mr-3" />
-                        🎲 Create Tournament! 🎲
-                      </Button>
+              {participants.length > 0 && !tournamentCreated && (
+                <>
+                  <div className="pt-4 border-t-2 border-primary/20">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-2xl font-bold flex items-center gap-2">
+                        <span className="text-3xl">👥</span>
+                        Players ({participants.length})
+                      </h3>
                     </div>
-                  </Card>
-                ) : (
-                  <Card className="p-8 text-center border-3 border-dashed border-primary/40 bg-card/70">
-                    <div className="text-5xl mb-4">👋</div>
-                    <p className="text-2xl font-semibold text-foreground">
-                      Need {4 - participants.length} more player{4 - participants.length !== 1 ? 's' : ''} to start! 
-                    </p>
-                    <p className="text-xl text-muted-foreground mt-2">Keep adding friends! 🌟</p>
-                  </Card>
-                )}
-              </>
-            )}
-          </div>
-        </Card>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {participants.map((participant, index) => (
+                        <Card
+                          key={index}
+                          className="p-5 hover:shadow-xl transition-all duration-200 border-2 border-primary/30 bg-gradient-to-br from-card/80 to-primary/5"
+                        >
+                          <div className="flex items-center gap-4">
+                            <Avatar className="h-16 w-16 border-3 border-primary/40 shadow-lg">
+                              <AvatarImage src={participant.image} alt={participant.name} />
+                              <AvatarFallback className="bg-primary/30 text-primary font-bold text-xl">
+                                {participant.name[0].toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1">
+                              <p className="font-bold text-lg">
+                                {participant.name}
+                              </p>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="lg"
+                              onClick={() => removeParticipant(index)}
+                              className="hover:bg-destructive/20 hover:text-destructive h-12 w-12"
+                            >
+                              <Trash2 className="w-6 h-6" />
+                            </Button>
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          </Card>
+        )}
 
         {/* Tournament Display */}
         {matchups.length > 0 && (
@@ -702,7 +622,7 @@ export const BracketGenerator = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              {isAdmin && !showLeaderboard && (
+              {isCreator && !showLeaderboard && (
                 <div className="flex gap-3 flex-wrap justify-center w-full">
                   <Button onClick={clearAllResults} variant="outline" size="lg" className="h-16 border-2">
                     <Trash2 className="w-5 h-5 mr-2" />
@@ -756,7 +676,7 @@ export const BracketGenerator = () => {
                         match={match}
                         participantName={matchup.participant.name}
                         onUpdateResult={updateMatchResult}
-                        isAdmin={true}
+                        isAdmin={isCreator}
                       />
                     ))}
                   </div>
