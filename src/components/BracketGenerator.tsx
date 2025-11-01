@@ -11,6 +11,7 @@ import stackingBanner from "@/assets/stacking-banner.png";
 import { Leaderboard } from "./Leaderboard";
 import { Navigation } from "./Navigation";
 import { supabase } from "@/integrations/supabase/client";
+import { JoinTournamentDialog } from "./JoinTournamentDialog";
 
 interface Participant {
   name: string;
@@ -39,6 +40,9 @@ export const BracketGenerator = () => {
   const [pokemonImages, setPokemonImages] = useState<string[]>([]);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [tournamentId, setTournamentId] = useState<string>("");
+  const [tournamentName, setTournamentName] = useState("");
+  const [userName, setUserName] = useState<string>("");
+  const [showJoinDialog, setShowJoinDialog] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -78,6 +82,15 @@ export const BracketGenerator = () => {
     const id = searchParams.get('id');
     if (id) {
       loadTournamentFromDatabase(id);
+      
+      // Check if user has a saved name for this tournament
+      const savedName = localStorage.getItem(`tournament_${id}_user`);
+      if (savedName) {
+        setUserName(savedName);
+      } else {
+        // Show join dialog after a short delay to load tournament name
+        setTimeout(() => setShowJoinDialog(true), 500);
+      }
     }
   }, [searchParams]);
 
@@ -126,6 +139,7 @@ export const BracketGenerator = () => {
       if (data) {
         setMatchups(data.matchups as unknown as MatchUp[]);
         setParticipants(data.participants as unknown as Participant[]);
+        setTournamentName(data.name);
         setTournamentCreated(true);
         setTournamentId(id);
         toast.success(`Tournament "${data.name}" loaded!`);
@@ -428,9 +442,25 @@ export const BracketGenerator = () => {
     toast.info("Tournament reset");
   };
 
+  const handleJoinTournament = (name: string) => {
+    setUserName(name);
+    if (tournamentId) {
+      localStorage.setItem(`tournament_${tournamentId}_user`, name);
+    }
+    setShowJoinDialog(false);
+    toast.success(`Welcome, ${name}!`);
+  };
+
   return (
     <div className="min-h-screen bg-[var(--gradient-dark)] p-4 md:p-8 relative overflow-hidden">
       <Navigation />
+      
+      {/* Join Tournament Dialog */}
+      <JoinTournamentDialog
+        open={showJoinDialog}
+        tournamentName={tournamentName || "Tournament"}
+        onJoin={handleJoinTournament}
+      />
       
       {/* Pokemon Background */}
       <div className="fixed inset-0 pointer-events-none opacity-10 z-0">
@@ -482,6 +512,12 @@ export const BracketGenerator = () => {
             Each participant gets 3 random opponents
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
+            {userName && tournamentId && (
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/20 border-2 border-accent/40 backdrop-blur-sm">
+                <User className="w-4 h-4 text-accent" />
+                <span className="text-sm font-bold text-accent">{userName}</span>
+              </div>
+            )}
             {isAdmin && (
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 border-2 border-primary/40 backdrop-blur-sm">
                 <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
