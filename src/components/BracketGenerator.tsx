@@ -195,7 +195,7 @@ export const BracketGenerator = () => {
       
       // If tournament is already generated, add the participant to it
       if (matchups.length > 0) {
-        addParticipantToTournament({ name, image: currentImage });
+        addParticipantToTournament({ name, image: currentImage }, newParticipants);
       } else {
         toast.success(`${name} added to the tournament!`);
       }
@@ -204,7 +204,7 @@ export const BracketGenerator = () => {
     }
   };
 
-  const addParticipantToTournament = (newParticipant: Participant) => {
+  const addParticipantToTournament = (newParticipant: Participant, updatedParticipantsList: Participant[]) => {
     // Find participants who have less than 3 matches
     const participantsWithAvailableSlots = matchups
       .filter(m => m.matches.length < 3)
@@ -215,8 +215,9 @@ export const BracketGenerator = () => {
     if (participantsWithAvailableSlots.length >= 3) {
       opponents = shuffleArray(participantsWithAvailableSlots).slice(0, 3);
     } else {
-      // Pick random participants, prioritizing those with fewer matches
-      opponents = shuffleArray([...participants]).slice(0, 3);
+      // Pick random participants from existing participants
+      const existingParticipants = matchups.map(m => m.participant);
+      opponents = shuffleArray([...existingParticipants]).slice(0, Math.min(3, existingParticipants.length));
     }
     
     // Create matches for the new participant
@@ -251,8 +252,9 @@ export const BracketGenerator = () => {
     ];
     
     setMatchups(updatedMatchups);
-    updateTournamentInDatabase(updatedMatchups);
-    toast.success(`${newParticipant.name} added to the tournament with 3 matches!`);
+    // Use the updated participants list passed from addParticipant
+    updateTournamentInDatabase(updatedMatchups, updatedParticipantsList);
+    toast.success(`🎉 ${newParticipant.name} added with ${opponents.length} matches!`);
   };
 
   const removeParticipant = (index: number) => {
@@ -306,7 +308,7 @@ export const BracketGenerator = () => {
     });
     
     setMatchups(updatedMatchups);
-    updateTournamentInDatabase(updatedMatchups);
+    updateTournamentInDatabase(updatedMatchups, participants);
     toast.success(`Match result recorded: ${score}`);
   };
 
@@ -329,7 +331,7 @@ export const BracketGenerator = () => {
     }
   };
 
-  const updateTournamentInDatabase = async (updatedMatchups: MatchUp[]) => {
+  const updateTournamentInDatabase = async (updatedMatchups: MatchUp[], updatedParticipants?: Participant[]) => {
     if (!tournamentId) return;
     
     try {
@@ -337,7 +339,7 @@ export const BracketGenerator = () => {
         .from('tournaments')
         .update({
           matchups: updatedMatchups as any,
-          participants: participants as any
+          participants: (updatedParticipants || participants) as any
         })
         .eq('id', tournamentId);
 
@@ -370,7 +372,7 @@ export const BracketGenerator = () => {
       }))
     }));
     setMatchups(clearedMatchups);
-    updateTournamentInDatabase(clearedMatchups);
+    updateTournamentInDatabase(clearedMatchups, participants);
     toast.info("All match results cleared");
   };
 
@@ -482,7 +484,18 @@ export const BracketGenerator = () => {
 
         {/* Input Section - Only show for creators */}
         {isCreator && (
-          <Card className="p-8 shadow-2xl animate-scale-in bg-card/95 backdrop-blur-sm border-3 border-primary/30">
+          <Card className="p-8 shadow-2xl animate-scale-in bg-[var(--gradient-card)] backdrop-blur-lg border-3 border-primary/40">
+            {tournamentCreated && matchups.length > 0 && (
+              <div className="mb-6 p-4 bg-primary/10 border-2 border-primary/30 rounded-xl">
+                <div className="flex items-center gap-3">
+                  <User className="w-6 h-6 text-primary" />
+                  <div>
+                    <p className="font-bold text-lg text-primary">Add New Players</p>
+                    <p className="text-sm text-foreground/70">New players will automatically get 3 random matches</p>
+                  </div>
+                </div>
+              </div>
+            )}
             <div className="space-y-6">
               <div className="flex flex-col gap-4">
                 <Input
@@ -521,11 +534,12 @@ export const BracketGenerator = () => {
                 <Button
                   onClick={addParticipant}
                   disabled={!currentName}
+                  variant={matchups.length > 0 ? "gradient" : "default"}
                   size="lg"
                   className="w-full h-16 text-xl font-bold"
                 >
                   <User className="w-6 h-6 mr-3" />
-                  {matchups.length > 0 ? "➕ Add to Tournament" : "➕ Add Player"}
+                  {matchups.length > 0 ? "➕ Add Player to Tournament" : "➕ Add Player"}
                 </Button>
               </div>
 
