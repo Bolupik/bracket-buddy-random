@@ -39,42 +39,43 @@ export default function RandomWheelPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--gradient-dark)] p-4 md:p-8">
+    <div className="min-h-screen bg-[var(--gradient-dark)] p-4 md:p-8 relative overflow-hidden">
       <Navigation />
+      
+      {/* Animated gradient overlay */}
+      <div className="fixed inset-0 bg-[var(--gradient-hero)] pointer-events-none" />
 
-      <div className="max-w-6xl mx-auto pt-24 space-y-8">
+      <div className="max-w-6xl mx-auto pt-24 space-y-10 relative z-10">
         {/* Banner */}
         <div className="w-full animate-fade-in">
           <img
             src={stackingBanner}
             alt="STACKING DAO"
-            className="w-full h-auto rounded-lg shadow-[var(--shadow-intense)] border-2 border-primary/30"
+            className="w-full h-auto rounded-2xl shadow-[var(--shadow-intense)] border-4 border-primary/40 hover:scale-[1.02] transition-transform duration-300"
           />
         </div>
 
         {/* Header */}
-        <div className="text-center space-y-4 animate-fade-in">
-          <h1 className="text-5xl md:text-7xl font-black tracking-tighter">
-            <span className="bg-[var(--gradient-primary)] bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(34,197,94,0.3)]">
-              RANDOM NAME SELECTOR
-            </span>
+        <div className="text-center space-y-6 animate-fade-in">
+          <h1 className="text-6xl md:text-8xl font-black tracking-tighter gradient-text drop-shadow-2xl">
+            RANDOM NAME SELECTOR
           </h1>
-          <p className="text-lg text-foreground/70 font-medium">
+          <p className="text-xl md:text-2xl text-foreground/80 font-semibold">
             Add names and spin the wheel to select randomly!
           </p>
         </div>
 
         {/* Add Participant Form */}
-        <Card className="p-6 bg-card/90 backdrop-blur-sm border-2 border-primary/20 animate-scale-in">
-          <div className="flex gap-3">
+        <Card className="p-8 backdrop-blur-lg border-2 border-primary/30 shadow-[var(--shadow-intense)] animate-scale-in">
+          <div className="flex gap-4">
             <Input
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               onKeyPress={(e) => e.key === "Enter" && addParticipant()}
               placeholder="Enter a name..."
-              className="flex-1 bg-background/50 border-primary/30 focus:border-primary text-lg"
+              className="flex-1 bg-background/50 border-2 border-primary/40 focus:border-primary text-lg h-14"
             />
-            <Button onClick={addParticipant} size="lg" className="px-8">
+            <Button onClick={addParticipant} variant="gradient" size="lg" className="px-10 h-14">
               <Plus className="w-5 h-5 mr-2" />
               Add
             </Button>

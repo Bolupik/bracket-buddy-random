@@ -8,13 +8,13 @@ export const Navigation = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <nav className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-card/95 backdrop-blur-lg border-2 border-primary/30 rounded-full px-6 py-3 shadow-[var(--shadow-elegant)] animate-fade-in">
-      <div className="flex items-center gap-2">
+    <nav className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-[var(--gradient-card)] backdrop-blur-xl border-2 border-primary/40 rounded-full px-8 py-3 shadow-[var(--shadow-elegant)] animate-fade-in">
+      <div className="flex items-center gap-3">
         <Link to="/">
           <Button
-            variant={isActive("/") ? "default" : "ghost"}
+            variant={isActive("/") ? "gradient" : "ghost"}
             size="sm"
-            className="rounded-full transition-all duration-300 hover:scale-105"
+            className="rounded-full font-semibold"
           >
             <Home className="w-4 h-4 mr-2" />
             View
@@ -23,9 +23,9 @@ export const Navigation = () => {
 
         <Link to="/create">
           <Button
-            variant={isActive("/create") ? "default" : "ghost"}
+            variant={isActive("/create") ? "gradient" : "ghost"}
             size="sm"
-            className="rounded-full transition-all duration-300 hover:scale-105"
+            className="rounded-full font-semibold"
           >
             <Plus className="w-4 h-4 mr-2" />
             Create
@@ -34,9 +34,9 @@ export const Navigation = () => {
 
         <Link to="/random-wheel">
           <Button
-            variant={isActive("/random-wheel") ? "default" : "ghost"}
+            variant={isActive("/random-wheel") ? "gradient" : "ghost"}
             size="sm"
-            className="rounded-full transition-all duration-300 hover:scale-105"
+            className="rounded-full font-semibold"
           >
             <Dices className="w-4 h-4 mr-2" />
             Random Wheel
@@ -45,9 +45,9 @@ export const Navigation = () => {
 
         <Link to="/wheel">
           <Button
-            variant={isActive("/wheel") ? "default" : "ghost"}
+            variant={isActive("/wheel") ? "gradient" : "ghost"}
             size="sm"
-            className="rounded-full transition-all duration-300 hover:scale-105"
+            className="rounded-full font-semibold"
           >
             <Trophy className="w-4 h-4 mr-2" />
             Winner Wheel

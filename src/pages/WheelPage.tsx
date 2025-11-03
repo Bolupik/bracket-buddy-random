@@ -60,6 +60,9 @@ export default function WheelPage() {
     <div className="min-h-screen bg-[var(--gradient-dark)] p-4 md:p-8 relative overflow-hidden">
       <Navigation />
       
+      {/* Animated gradient overlay */}
+      <div className="fixed inset-0 bg-[var(--gradient-hero)] pointer-events-none z-0" />
+      
       {/* Pokemon Background */}
       <div className="fixed inset-0 pointer-events-none opacity-10 z-0">
         {pokemonImages.map((img, index) => (
@@ -79,34 +82,31 @@ export default function WheelPage() {
         ))}
       </div>
 
-      <div className="max-w-6xl mx-auto pt-24 space-y-8 relative z-10">
+      <div className="max-w-6xl mx-auto pt-24 space-y-10 relative z-10">
         {/* Banner Image */}
         <div className="w-full animate-fade-in">
           <img 
             src={stackingBanner} 
             alt="STACKING DAO" 
-            className="w-full h-auto rounded-lg shadow-[var(--shadow-intense)] border-2 border-primary/30"
+            className="w-full h-auto rounded-2xl shadow-[var(--shadow-intense)] border-4 border-primary/40 hover:scale-[1.02] transition-transform duration-300"
           />
         </div>
 
         {/* Header */}
-        <div className="text-center space-y-4 animate-fade-in relative">
-          <div className="absolute inset-0 bg-[var(--gradient-primary)] opacity-10 blur-3xl -z-10"></div>
+        <div className="text-center space-y-6 animate-fade-in relative">
           <div className="relative">
-            <h1 className="text-6xl md:text-8xl font-black tracking-tighter">
-              <span className="bg-[var(--gradient-primary)] bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(34,197,94,0.3)]">
-                STACKINGDAO
-              </span>
+            <h1 className="text-6xl md:text-8xl font-black tracking-tighter gradient-text drop-shadow-2xl">
+              STACKINGDAO
             </h1>
-            <div className="flex items-center justify-center gap-3 mt-2">
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary to-transparent"></div>
-              <p className="text-xl md:text-2xl font-bold text-primary/90 uppercase tracking-widest">
-                {isTiebreaker ? "Tiebreaker Selection" : "Winner Selection Wheel"}
+            <div className="flex items-center justify-center gap-4 mt-4">
+              <div className="h-1 flex-1 bg-gradient-to-r from-transparent via-primary to-transparent rounded-full"></div>
+              <p className="text-2xl md:text-3xl font-black text-primary uppercase tracking-widest px-6 py-2 bg-primary/10 rounded-full border-2 border-primary/30">
+                {isTiebreaker ? "🔥 Tiebreaker 🔥" : "🏆 Winner Wheel 🏆"}
               </p>
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary to-transparent"></div>
+              <div className="h-1 flex-1 bg-gradient-to-r from-transparent via-primary to-transparent rounded-full"></div>
             </div>
           </div>
-          <p className="text-lg text-foreground/70 font-medium">
+          <p className="text-xl md:text-2xl text-foreground/80 font-semibold">
             {isTiebreaker
               ? "Spin to resolve the tie and determine final rankings!"
               : "Spin the wheel to select a random winner!"}

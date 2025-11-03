@@ -218,7 +218,7 @@ export const WinnerWheel = ({ participants }: WinnerWheelProps) => {
             <Button
               onClick={() => setShowWinnerDialog(false)}
               size="lg"
-              variant="dark"
+              variant="gradient"
               className="text-xl px-12 py-6"
             >
               Close

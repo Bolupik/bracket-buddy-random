@@ -186,27 +186,30 @@ const CreateTournamentPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+    <div className="min-h-screen bg-[var(--gradient-dark)] relative overflow-hidden">
       <Navigation />
       
-      <div className="container max-w-2xl mx-auto px-4 pt-24 pb-12">
+      {/* Animated gradient background */}
+      <div className="fixed inset-0 bg-[var(--gradient-hero)] pointer-events-none" />
+      
+      <div className="container max-w-2xl mx-auto px-4 pt-24 pb-12 relative z-10">
         <div className="animate-fade-in">
           {/* Header */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-4">
-              <Trophy className="w-10 h-10 text-primary" />
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-[var(--gradient-primary)] mb-6 animate-pulse-glow">
+              <Trophy className="w-12 h-12 text-primary-foreground" />
             </div>
-            <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+            <h1 className="text-5xl font-black mb-4 gradient-text drop-shadow-lg">
               Create Tournament
             </h1>
-            <p className="text-muted-foreground text-lg">
+            <p className="text-muted-foreground text-xl font-medium">
               Set up your tournament and invite players
             </p>
           </div>
 
           {/* Creation Form */}
-          <Card className="p-8 backdrop-blur-sm bg-card/95 border-2 border-primary/20 shadow-[var(--shadow-elegant)]">
-            <div className="space-y-6">
+          <Card className="p-10 backdrop-blur-lg border-2 border-primary/30 shadow-[var(--shadow-intense)]">
+            <div className="space-y-8">
               {/* Tournament Name */}
               <div className="space-y-2">
                 <label className="flex items-center gap-2 text-sm font-medium">
@@ -339,14 +342,15 @@ const CreateTournamentPage = () => {
               <Button
                 onClick={handleCreateTournament}
                 disabled={isCreating || !tournamentName.trim() || !creatorName.trim() || participants.length < 4}
-                className="w-full h-14 text-lg font-semibold shadow-[var(--shadow-elegant)] hover:scale-105 transition-transform"
+                variant="gradient"
+                className="w-full h-16 text-xl font-bold"
                 size="lg"
               >
                 {isCreating ? (
                   <>Creating Tournament...</>
                 ) : (
                   <>
-                    <Shuffle className="w-5 h-5 mr-2" />
+                    <Shuffle className="w-6 h-6 mr-2" />
                     Create Tournament 🚀
                   </>
                 )}
