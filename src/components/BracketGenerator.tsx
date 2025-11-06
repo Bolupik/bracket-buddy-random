@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash2, Shuffle, Upload, User, Award, BarChart3, Share2, Copy } from "lucide-react";
+import { Trash2, Shuffle, Upload, User, Award, BarChart3, Share2, Copy, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { MatchCard } from "./MatchCard";
@@ -361,6 +361,33 @@ export const BracketGenerator = () => {
     toast.success("Shareable tournament link copied to clipboard! 🔗");
   };
 
+  const sendEmailBackup = async () => {
+    if (!tournamentId || !tournamentName) {
+      toast.error("No tournament to backup");
+      return;
+    }
+
+    try {
+      toast.loading("Sending backup email...");
+      
+      const { error } = await supabase.functions.invoke('send-tournament-backup', {
+        body: {
+          tournamentName,
+          tournamentId,
+          participants,
+          matchups
+        }
+      });
+
+      if (error) throw error;
+
+      toast.success("Tournament backup sent to ajayibolu22@gmail.com! 📧");
+    } catch (error) {
+      console.error('Error sending backup:', error);
+      toast.error("Failed to send backup email");
+    }
+  };
+
   const clearAllResults = () => {
     const clearedMatchups = matchups.map(matchup => ({
       ...matchup,
@@ -607,7 +634,7 @@ export const BracketGenerator = () => {
               </div>
             </Card>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <Button
                 onClick={shareTournament}
                 size="lg"
@@ -615,6 +642,15 @@ export const BracketGenerator = () => {
               >
                 <Share2 className="w-6 h-6 mr-2" />
                 🔗 Share Link
+              </Button>
+              <Button
+                onClick={sendEmailBackup}
+                size="lg"
+                variant="gradient"
+                className="h-20 text-lg font-bold"
+              >
+                <Mail className="w-6 h-6 mr-2" />
+                📧 Email Backup
               </Button>
               <Button
                 onClick={() => navigate("/wheel")}

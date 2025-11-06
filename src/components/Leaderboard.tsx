@@ -2,7 +2,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Trophy, Medal, User, Award } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { WinnerWheel } from "./WinnerWheel";
+import { useState } from "react";
 
 interface Participant {
   name: string;
@@ -34,7 +35,8 @@ interface LeaderboardProps {
 }
 
 export const Leaderboard = ({ matchups }: LeaderboardProps) => {
-  const navigate = useNavigate();
+  const [showTiebreakerWheel, setShowTiebreakerWheel] = useState(false);
+  const [tiebreakerParticipants, setTiebreakerParticipants] = useState<Participant[]>([]);
 
   // Calculate stats for each participant
   const leaderboardData: LeaderboardEntry[] = matchups.map(matchup => {
@@ -92,8 +94,8 @@ export const Leaderboard = ({ matchups }: LeaderboardProps) => {
 
   const handleTiebreaker = (tiedPlayers: LeaderboardEntry[]) => {
     const participants = tiedPlayers.map(entry => entry.participant);
-    localStorage.setItem("tiebreakerParticipants", JSON.stringify(participants));
-    navigate("/wheel?mode=tiebreaker");
+    setTiebreakerParticipants(participants);
+    setShowTiebreakerWheel(true);
   };
 
   const getRankIcon = (index: number) => {
@@ -174,8 +176,39 @@ export const Leaderboard = ({ matchups }: LeaderboardProps) => {
         ))}
       </div>
 
+      {/* Tiebreaker Wheel Section */}
+      {showTiebreakerWheel && tiebreakerParticipants.length > 0 && (
+        <div className="space-y-6 animate-scale-in">
+          <Card className="p-8 bg-gradient-to-br from-primary/20 via-accent/20 to-primary/20 border-4 border-primary/40 shadow-[var(--shadow-intense)]">
+            <div className="text-center space-y-4 mb-8">
+              <div className="flex items-center justify-center gap-3">
+                <Award className="w-10 h-10 text-primary animate-pulse" />
+                <h2 className="text-4xl font-black bg-[var(--gradient-primary)] bg-clip-text text-transparent">
+                  TIEBREAKER WHEEL
+                </h2>
+                <Award className="w-10 h-10 text-primary animate-pulse" />
+              </div>
+              <p className="text-xl text-foreground/80 font-semibold">
+                Spin the wheel to break the tie!
+              </p>
+            </div>
+            <WinnerWheel participants={tiebreakerParticipants} />
+            <div className="mt-6 text-center">
+              <Button
+                onClick={() => setShowTiebreakerWheel(false)}
+                variant="outline"
+                size="lg"
+                className="text-lg px-8"
+              >
+                Back to Leaderboard
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
+
       {/* Tiebreaker Section */}
-      {allMatchesComplete && tiedGroups.length > 0 && (
+      {!showTiebreakerWheel && allMatchesComplete && tiedGroups.length > 0 && (
         <Card className="p-6 bg-yellow-500/10 border-2 border-yellow-500/30 animate-scale-in">
           <div className="space-y-4">
             <div className="flex items-center gap-3">
