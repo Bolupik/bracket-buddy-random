@@ -15,11 +15,21 @@ interface Participant {
   image?: string;
 }
 
-interface WinnerWheelProps {
-  participants: Participant[];
+interface ParticipantStats {
+  participant: Participant;
+  wins: number;
+  losses: number;
+  draws: number;
+  rank: number;
 }
 
-export const WinnerWheel = ({ participants }: WinnerWheelProps) => {
+interface WinnerWheelProps {
+  participants: Participant[];
+  tournamentName?: string;
+  participantStats?: ParticipantStats[];
+}
+
+export const WinnerWheel = ({ participants, tournamentName, participantStats }: WinnerWheelProps) => {
   const [isSpinning, setIsSpinning] = useState(false);
   const [rotation, setRotation] = useState(0);
   const [winner, setWinner] = useState<Participant | null>(null);
@@ -78,8 +88,43 @@ export const WinnerWheel = ({ participants }: WinnerWheelProps) => {
 
   const segmentAngle = 360 / participants.length;
 
+  const getParticipantStats = (participantName: string) => {
+    return participantStats?.find(stat => stat.participant.name === participantName);
+  };
+
   return (
     <div className="space-y-8">
+      {/* Tournament Info */}
+      {tournamentName && (
+        <Card className="p-4 bg-primary/10 border-2 border-primary/30 text-center">
+          <p className="text-lg font-bold text-foreground">
+            🏆 {tournamentName} - Tiebreaker Round
+          </p>
+        </Card>
+      )}
+
+      {/* Participants Stats Overview */}
+      {participantStats && participantStats.length > 0 && (
+        <Card className="p-4 bg-card/90 backdrop-blur-sm border-2 border-primary/20">
+          <h3 className="text-lg font-bold text-foreground mb-3 text-center">Tied Participants</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {participantStats.map(stat => (
+              <div key={stat.participant.name} className="flex items-center justify-between p-3 bg-background/50 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">#{stat.rank}</span>
+                  <span className="font-semibold">{stat.participant.name}</span>
+                </div>
+                <div className="flex gap-3 text-sm">
+                  <span className="text-green-500 font-bold">{stat.wins}W</span>
+                  <span className="text-red-500 font-bold">{stat.losses}L</span>
+                  <span className="text-yellow-500 font-bold">{stat.draws}D</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
       {/* Wheel Container */}
       <div className="relative flex items-center justify-center">
         {/* Pointer */}
@@ -187,6 +232,16 @@ export const WinnerWheel = ({ participants }: WinnerWheelProps) => {
               <Trophy className="w-12 h-12 mx-auto text-primary" />
               <p className="text-2xl font-bold text-primary">Winner!</p>
               <p className="text-3xl font-black text-foreground">{winner.name}</p>
+              {getParticipantStats(winner.name) && (
+                <div className="pt-2 border-t border-primary/20 mt-3">
+                  <p className="text-sm text-muted-foreground mb-1">Tournament Stats</p>
+                  <div className="flex justify-center gap-4 text-lg">
+                    <span className="text-green-500 font-bold">{getParticipantStats(winner.name)?.wins} Wins</span>
+                    <span className="text-red-500 font-bold">{getParticipantStats(winner.name)?.losses} Losses</span>
+                    <span className="text-yellow-500 font-bold">{getParticipantStats(winner.name)?.draws} Draws</span>
+                  </div>
+                </div>
+              )}
             </div>
           </Card>
         )}
@@ -214,6 +269,28 @@ export const WinnerWheel = ({ participants }: WinnerWheelProps) => {
               <p className="text-2xl text-primary font-bold">
                 Congratulations! 🎉
               </p>
+              {winner && getParticipantStats(winner.name) && (
+                <div className="pt-4 mt-4 border-t-2 border-primary/30">
+                  <p className="text-lg text-muted-foreground mb-2">Final Position</p>
+                  <p className="text-5xl font-black text-primary mb-3">
+                    #{getParticipantStats(winner.name)?.rank}
+                  </p>
+                  <div className="flex justify-center gap-6 text-xl">
+                    <div>
+                      <p className="text-3xl font-bold text-green-500">{getParticipantStats(winner.name)?.wins}</p>
+                      <p className="text-xs text-muted-foreground">WINS</p>
+                    </div>
+                    <div>
+                      <p className="text-3xl font-bold text-red-500">{getParticipantStats(winner.name)?.losses}</p>
+                      <p className="text-xs text-muted-foreground">LOSSES</p>
+                    </div>
+                    <div>
+                      <p className="text-3xl font-bold text-yellow-500">{getParticipantStats(winner.name)?.draws}</p>
+                      <p className="text-xs text-muted-foreground">DRAWS</p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
             <Button
               onClick={() => setShowWinnerDialog(false)}

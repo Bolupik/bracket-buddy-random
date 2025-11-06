@@ -32,9 +32,10 @@ interface LeaderboardEntry {
 
 interface LeaderboardProps {
   matchups: MatchUp[];
+  tournamentName?: string;
 }
 
-export const Leaderboard = ({ matchups }: LeaderboardProps) => {
+export const Leaderboard = ({ matchups, tournamentName }: LeaderboardProps) => {
   const [showTiebreakerWheel, setShowTiebreakerWheel] = useState(false);
   const [tiebreakerParticipants, setTiebreakerParticipants] = useState<Participant[]>([]);
 
@@ -96,6 +97,23 @@ export const Leaderboard = ({ matchups }: LeaderboardProps) => {
     const participants = tiedPlayers.map(entry => entry.participant);
     setTiebreakerParticipants(participants);
     setShowTiebreakerWheel(true);
+  };
+
+  const getTiebreakerStats = () => {
+    if (tiebreakerParticipants.length === 0) return [];
+    
+    return tiebreakerParticipants.map(participant => {
+      const entry = sortedLeaderboard.find(e => e.participant.name === participant.name);
+      const rank = sortedLeaderboard.findIndex(e => e.participant.name === participant.name) + 1;
+      
+      return {
+        participant,
+        wins: entry?.wins || 0,
+        losses: entry?.losses || 0,
+        draws: entry?.draws || 0,
+        rank,
+      };
+    });
   };
 
   const getRankIcon = (index: number) => {
@@ -192,7 +210,11 @@ export const Leaderboard = ({ matchups }: LeaderboardProps) => {
                 Spin the wheel to break the tie!
               </p>
             </div>
-            <WinnerWheel participants={tiebreakerParticipants} />
+            <WinnerWheel 
+              participants={tiebreakerParticipants}
+              tournamentName={tournamentName}
+              participantStats={getTiebreakerStats()}
+            />
             <div className="mt-6 text-center">
               <Button
                 onClick={() => setShowTiebreakerWheel(false)}

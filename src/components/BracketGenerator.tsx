@@ -687,7 +687,7 @@ export const BracketGenerator = () => {
             </div>
             
             {showLeaderboard ? (
-              <Leaderboard matchups={matchups} />
+              <Leaderboard matchups={matchups} tournamentName={tournamentName} />
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {matchups.map((matchup, index) => (
