@@ -10,6 +10,9 @@ import RandomWheelPage from "./pages/RandomWheelPage";
 import CreateTournamentPage from "./pages/CreateTournamentPage";
 import AuthPage from "./pages/AuthPage";
 import TournamentBrowserPage from "./pages/TournamentBrowserPage";
+import AdminDashboard from "./pages/AdminDashboard";
+import SchedulePage from "./pages/SchedulePage";
+import AvailabilityPage from "./pages/AvailabilityPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +29,9 @@ const App = () => (
           <Route path="/create" element={<CreateTournamentPage />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/tournaments" element={<TournamentBrowserPage />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/schedule" element={<SchedulePage />} />
+          <Route path="/availability" element={<AvailabilityPage />} />
           <Route path="/wheel" element={<WheelPage />} />
           <Route path="/random-wheel" element={<RandomWheelPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

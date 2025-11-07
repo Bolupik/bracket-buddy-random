@@ -14,6 +14,174 @@ export type Database = {
   }
   public: {
     Tables: {
+      courts: {
+        Row: {
+          created_at: string | null
+          id: string
+          location: string | null
+          name: string
+          tournament_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          location?: string | null
+          name: string
+          tournament_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          location?: string | null
+          name?: string
+          tournament_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "courts_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      player_availability: {
+        Row: {
+          available_times: Json
+          created_at: string | null
+          id: string
+          notes: string | null
+          tournament_id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          available_times?: Json
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          tournament_id: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          available_times?: Json
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          tournament_id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_availability_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      scheduled_matches: {
+        Row: {
+          court_id: string | null
+          created_at: string | null
+          duration_minutes: number | null
+          id: string
+          match_number: number
+          participant1_name: string
+          participant2_name: string
+          result: Json | null
+          scheduled_time: string | null
+          status: string | null
+          tournament_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          court_id?: string | null
+          created_at?: string | null
+          duration_minutes?: number | null
+          id?: string
+          match_number: number
+          participant1_name: string
+          participant2_name: string
+          result?: Json | null
+          scheduled_time?: string | null
+          status?: string | null
+          tournament_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          court_id?: string | null
+          created_at?: string | null
+          duration_minutes?: number | null
+          id?: string
+          match_number?: number
+          participant1_name?: string
+          participant2_name?: string
+          result?: Json | null
+          scheduled_time?: string | null
+          status?: string | null
+          tournament_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scheduled_matches_court_id_fkey"
+            columns: ["court_id"]
+            isOneToOne: false
+            referencedRelation: "courts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "scheduled_matches_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tournament_notifications: {
+        Row: {
+          created_at: string | null
+          id: string
+          message: string
+          notification_type: string
+          read: boolean | null
+          tournament_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          message: string
+          notification_type: string
+          read?: boolean | null
+          tournament_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          message?: string
+          notification_type?: string
+          read?: boolean | null
+          tournament_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tournament_notifications_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tournaments: {
         Row: {
           created_at: string
