@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Trophy, Dices, Home, Plus } from "lucide-react";
+import { Trophy, Dices, Home, Plus, ListTodo } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const Navigation = () => {
@@ -29,6 +29,17 @@ export const Navigation = () => {
           >
             <Plus className="w-4 h-4 mr-2" />
             Create
+          </Button>
+        </Link>
+
+        <Link to="/tournaments">
+          <Button
+            variant={isActive("/tournaments") ? "gradient" : "ghost"}
+            size="sm"
+            className="rounded-full font-semibold"
+          >
+            <ListTodo className="w-4 h-4 mr-2" />
+            Tournaments
           </Button>
         </Link>
 
