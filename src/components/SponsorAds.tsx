@@ -46,11 +46,11 @@ const sponsors: Sponsor[] = [
   }
 ];
 
-export const SponsorAds = () => {
+export const ToolAds = () => {
   return (
     <div className="w-full space-y-4">
       <p className="text-center text-xs text-muted-foreground uppercase tracking-wider">
-        Our Sponsors
+        Discover More Tools
       </p>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
         {sponsors.map((sponsor) => (
