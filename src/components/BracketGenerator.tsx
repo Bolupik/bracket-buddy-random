@@ -8,6 +8,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { MatchCard } from "./MatchCard";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import stackingBanner from "@/assets/stacking-banner.png";
+import { StackingDaoAd } from "./StackingDaoAd";
 import { Leaderboard } from "./Leaderboard";
 import { Navigation } from "./Navigation";
 import { supabase } from "@/integrations/supabase/client";
@@ -448,13 +449,9 @@ export const BracketGenerator = () => {
       </div>
       
       <div className="max-w-6xl mx-auto space-y-8 relative z-10">
-        {/* Banner Image */}
+        {/* Stacking DAO Ad */}
         <div className="w-full animate-fade-in">
-          <img 
-            src={stackingBanner} 
-            alt="STACKING DAO" 
-            className="w-full h-auto rounded-lg shadow-[var(--shadow-intense)] border-2 border-primary/30"
-          />
+          <StackingDaoAd />
         </div>
 
         {/* Header */}
