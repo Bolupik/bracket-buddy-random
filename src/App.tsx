@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { FloatingPikachu } from "@/components/FloatingPikachu";
+import LandingPage from "./pages/LandingPage";
 import Index from "./pages/Index";
 import WheelPage from "./pages/WheelPage";
 import RandomWheelPage from "./pages/RandomWheelPage";
@@ -25,7 +26,8 @@ const App = () => (
       <FloatingPikachu />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/home" element={<Index />} />
           <Route path="/create" element={<CreateTournamentPage />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/tournaments" element={<TournamentBrowserPage />} />
