@@ -9,7 +9,7 @@ import { MatchCard } from "./MatchCard";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import stackingBanner from "@/assets/stacking-banner.png";
 import { StackingDaoAd } from "./StackingDaoAd";
-import { SponsorAds } from "./SponsorAds";
+import { ToolAds } from "./SponsorAds";
 import { Leaderboard } from "./Leaderboard";
 import { Navigation } from "./Navigation";
 import { supabase } from "@/integrations/supabase/client";
@@ -737,7 +737,7 @@ export const BracketGenerator = () => {
 
         {/* Bottom Sponsor Ads */}
         <div className="mt-12 pt-8 border-t border-border/30 animate-fade-in">
-          <SponsorAds />
+          <ToolAds />
         </div>
       </div>
     </div>
