@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import menacingPikachu from "@/assets/menacing-pikachu.jpg";
 
@@ -11,9 +11,22 @@ interface PageTransitionProps {
 export const PageTransition = ({ isActive, targetPath, onComplete }: PageTransitionProps) => {
   const navigate = useNavigate();
   const [phase, setPhase] = useState<"idle" | "enter" | "hold" | "exit">("idle");
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const playTransitionSound = useCallback(() => {
+    try {
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play();
+      }
+    } catch (e) {
+      console.log("Audio playback failed:", e);
+    }
+  }, []);
 
   const runTransition = useCallback(() => {
     setPhase("enter");
+    playTransitionSound();
     
     // After enter animation, hold
     setTimeout(() => {
@@ -31,7 +44,7 @@ export const PageTransition = ({ isActive, targetPath, onComplete }: PageTransit
       setPhase("idle");
       onComplete();
     }, 1800);
-  }, [navigate, targetPath, onComplete]);
+  }, [navigate, targetPath, onComplete, playTransitionSound]);
 
   useEffect(() => {
     if (isActive && phase === "idle") {
@@ -125,6 +138,9 @@ export const PageTransition = ({ isActive, targetPath, onComplete }: PageTransit
           }
         }
       `}</style>
+      
+      {/* Audio element for transition sound */}
+      <audio ref={audioRef} src="/sounds/transition.mp3" preload="auto" />
     </div>
   );
 };
