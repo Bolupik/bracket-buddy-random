@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { MoreHorizontal, Moon, Sun } from "lucide-react";
 import pikachuImage from "@/assets/pikachu.png";
+import { PageTransition, usePageTransition } from "@/components/PageTransition";
 
 const LandingPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [isDark, setIsDark] = useState(false);
+  const { isTransitioning, targetPath, startTransition, completeTransition } = usePageTransition();
   
   // Redirect to home if there's a tournament parameter
   useEffect(() => {
@@ -164,7 +166,7 @@ const LandingPage = () => {
       {/* Bottom Explore Button */}
       <div className="pb-8 flex justify-center">
         <button
-          onClick={() => navigate("/home")}
+          onClick={() => startTransition("/home")}
           className={`group flex items-center gap-4 border rounded-full px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300 ${
             isDark 
               ? 'bg-neutral-800 hover:bg-neutral-700 border-neutral-600 text-neutral-200' 
@@ -178,6 +180,13 @@ const LandingPage = () => {
           <MoreHorizontal className={`w-5 h-5 ${isDark ? 'text-neutral-400' : 'text-neutral-400'}`} />
         </button>
       </div>
+
+      {/* Page Transition */}
+      <PageTransition 
+        isActive={isTransitioning} 
+        targetPath={targetPath} 
+        onComplete={completeTransition} 
+      />
     </div>
   );
 };
