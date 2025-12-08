@@ -5,7 +5,8 @@ interface Sponsor {
   tagline: string;
   url: string;
   color: string;
-  icon: string;
+  logo: string;
+  logoStyle?: string;
 }
 
 const sponsors: Sponsor[] = [
@@ -14,35 +15,40 @@ const sponsors: Sponsor[] = [
     tagline: "AI-powered learning for Stacks",
     url: "https://stacks-mentor-ai.lovable.app",
     color: "from-purple-600 to-indigo-600",
-    icon: "🤖"
+    logo: "SM",
+    logoStyle: "bg-gradient-to-br from-purple-500 to-indigo-600"
   },
   {
     name: "BoostX",
     tagline: "Amplify your crypto journey",
     url: "https://boostx.cc/",
     color: "from-orange-500 to-red-500",
-    icon: "🚀"
+    logo: "BX",
+    logoStyle: "bg-gradient-to-br from-orange-500 to-red-500"
   },
   {
     name: "Zest Protocol",
     tagline: "DeFi lending on Bitcoin",
     url: "https://app.zestprotocol.com",
     color: "from-yellow-500 to-amber-600",
-    icon: "⚡"
+    logo: "Z",
+    logoStyle: "bg-gradient-to-br from-yellow-400 to-amber-600"
   },
   {
     name: "STX Tools",
     tagline: "Essential Stacks analytics",
     url: "https://stxtools.io/",
     color: "from-blue-500 to-cyan-500",
-    icon: "📊"
+    logo: "STX",
+    logoStyle: "bg-gradient-to-br from-blue-500 to-cyan-400"
   },
   {
     name: "Deorganized",
     tagline: "Web3 media & insights",
     url: "https://deorganized.media",
     color: "from-pink-500 to-rose-500",
-    icon: "📰"
+    logo: "D",
+    logoStyle: "bg-gradient-to-br from-pink-500 to-rose-500"
   }
 ];
 
@@ -64,7 +70,9 @@ export const ToolAds = () => {
             <div className={`relative overflow-hidden rounded-lg bg-gradient-to-br ${sponsor.color} p-[1px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105`}>
               <div className="rounded-lg bg-background/95 p-3 h-full">
                 <div className="flex flex-col items-center text-center gap-2">
-                  <span className="text-2xl">{sponsor.icon}</span>
+                  <div className={`w-10 h-10 rounded-lg ${sponsor.logoStyle} flex items-center justify-center shadow-md`}>
+                    <span className="text-white font-bold text-sm tracking-tight">{sponsor.logo}</span>
+                  </div>
                   <div>
                     <h4 className="text-sm font-bold text-foreground leading-tight">
                       {sponsor.name}
