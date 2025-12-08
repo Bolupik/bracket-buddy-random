@@ -1,11 +1,15 @@
 import { ExternalLink } from "lucide-react";
+import stacksMentorLogo from "@/assets/sponsors/stacks-mentor-ai.ico";
+import boostxLogo from "@/assets/sponsors/boostx.ico";
+import stxtoolsLogo from "@/assets/sponsors/stxtools.ico";
 
 interface Sponsor {
   name: string;
   tagline: string;
   url: string;
   color: string;
-  logo: string;
+  logo?: string;
+  fallbackLogo?: string;
   logoStyle?: string;
 }
 
@@ -15,23 +19,21 @@ const sponsors: Sponsor[] = [
     tagline: "AI-powered learning for Stacks",
     url: "https://stacks-mentor-ai.lovable.app",
     color: "from-purple-600 to-indigo-600",
-    logo: "SM",
-    logoStyle: "bg-gradient-to-br from-purple-500 to-indigo-600"
+    logo: stacksMentorLogo,
   },
   {
     name: "BoostX",
     tagline: "Amplify your crypto journey",
     url: "https://boostx.cc/",
     color: "from-orange-500 to-red-500",
-    logo: "BX",
-    logoStyle: "bg-gradient-to-br from-orange-500 to-red-500"
+    logo: boostxLogo,
   },
   {
     name: "Zest Protocol",
     tagline: "DeFi lending on Bitcoin",
     url: "https://app.zestprotocol.com",
     color: "from-yellow-500 to-amber-600",
-    logo: "Z",
+    fallbackLogo: "Z",
     logoStyle: "bg-gradient-to-br from-yellow-400 to-amber-600"
   },
   {
@@ -39,15 +41,14 @@ const sponsors: Sponsor[] = [
     tagline: "Essential Stacks analytics",
     url: "https://stxtools.io/",
     color: "from-blue-500 to-cyan-500",
-    logo: "STX",
-    logoStyle: "bg-gradient-to-br from-blue-500 to-cyan-400"
+    logo: stxtoolsLogo,
   },
   {
     name: "Deorganized",
     tagline: "Web3 media & insights",
     url: "https://deorganized.media",
     color: "from-pink-500 to-rose-500",
-    logo: "D",
+    fallbackLogo: "D",
     logoStyle: "bg-gradient-to-br from-pink-500 to-rose-500"
   }
 ];
@@ -70,9 +71,19 @@ export const ToolAds = () => {
             <div className={`relative overflow-hidden rounded-lg bg-gradient-to-br ${sponsor.color} p-[1px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105`}>
               <div className="rounded-lg bg-background/95 p-3 h-full">
                 <div className="flex flex-col items-center text-center gap-2">
-                  <div className={`w-10 h-10 rounded-lg ${sponsor.logoStyle} flex items-center justify-center shadow-md`}>
-                    <span className="text-white font-bold text-sm tracking-tight">{sponsor.logo}</span>
-                  </div>
+                  {sponsor.logo ? (
+                    <div className="w-10 h-10 rounded-lg overflow-hidden flex items-center justify-center bg-white/10">
+                      <img 
+                        src={sponsor.logo} 
+                        alt={`${sponsor.name} logo`}
+                        className="w-8 h-8 object-contain"
+                      />
+                    </div>
+                  ) : (
+                    <div className={`w-10 h-10 rounded-lg ${sponsor.logoStyle} flex items-center justify-center shadow-md`}>
+                      <span className="text-white font-bold text-sm tracking-tight">{sponsor.fallbackLogo}</span>
+                    </div>
+                  )}
                   <div>
                     <h4 className="text-sm font-bold text-foreground leading-tight">
                       {sponsor.name}
