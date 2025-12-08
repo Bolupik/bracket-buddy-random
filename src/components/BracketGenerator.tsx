@@ -431,22 +431,33 @@ export const BracketGenerator = () => {
       />
       
       {/* Pokemon Background */}
-      <div className="fixed inset-0 pointer-events-none opacity-10 z-0">
-        {pokemonImages.map((img, index) => (
-          <img
-            key={index}
-            src={img}
-            alt=""
-            className="absolute animate-float"
-            style={{
-              width: `${80 + Math.random() * 120}px`,
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${15 + Math.random() * 10}s`,
-            }}
-          />
-        ))}
+      <div className="fixed inset-0 pointer-events-none opacity-15 z-0">
+        {pokemonImages.map((img, index) => {
+          const animations = ['animate-float-drift', 'animate-float-spin', 'animate-float-bounce', 'animate-float-zigzag'];
+          const randomAnimation = animations[index % animations.length];
+          const size = 80 + (index * 7) % 100;
+          const top = (index * 17) % 100;
+          const left = (index * 23) % 100;
+          const delay = (index * 0.7) % 8;
+          const duration = 15 + (index * 3) % 15;
+          
+          return (
+            <img
+              key={index}
+              src={img}
+              alt=""
+              className={`absolute ${randomAnimation} drop-shadow-lg`}
+              style={{
+                width: `${size}px`,
+                top: `${top}%`,
+                left: `${left}%`,
+                animationDelay: `${delay}s`,
+                animationDuration: `${duration}s`,
+                filter: 'drop-shadow(0 0 10px hsl(var(--primary) / 0.3))',
+              }}
+            />
+          );
+        })}
       </div>
       
       <div className="max-w-6xl mx-auto space-y-8 relative z-10">
