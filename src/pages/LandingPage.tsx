@@ -188,11 +188,10 @@ const LandingPage = () => {
           {/* Main Title */}
           <div className="space-y-4">
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-foreground leading-none tracking-tight">
-              <span className="block">POKEMON</span>
+              <span className="block">BRACKET</span>
               <span className="block bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-pulse">
-                TOURNAMENT
+                BUDDY
               </span>
-              <span className="block">ARENA</span>
             </h1>
           </div>
           
