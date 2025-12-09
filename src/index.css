@@ -215,6 +215,19 @@ All colors MUST be HSL.
     animation: pulse-glow 2s ease-in-out infinite;
   }
   
+  @keyframes scroll-marquee {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+  
+  .animate-scroll-marquee {
+    animation: scroll-marquee 30s linear infinite;
+  }
+  
   .gradient-text {
     @apply bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent;
   }
