@@ -53,6 +53,48 @@ const sponsors: Sponsor[] = [
   }
 ];
 
+export const ScrollingToolAds = () => {
+  // Duplicate sponsors for seamless loop
+  const duplicatedSponsors = [...sponsors, ...sponsors];
+
+  return (
+    <div className="w-full overflow-hidden bg-card/50 backdrop-blur-sm border-b border-border/50 py-2">
+      <div className="flex animate-scroll-marquee">
+        {duplicatedSponsors.map((sponsor, index) => (
+          <a
+            key={`${sponsor.name}-${index}`}
+            href={sponsor.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-6 whitespace-nowrap hover:opacity-80 transition-opacity group"
+          >
+            {sponsor.logo ? (
+              <div className="w-5 h-5 rounded overflow-hidden flex items-center justify-center bg-white/10 flex-shrink-0">
+                <img 
+                  src={sponsor.logo} 
+                  alt={`${sponsor.name} logo`}
+                  className="w-4 h-4 object-contain"
+                />
+              </div>
+            ) : (
+              <div className={`w-5 h-5 rounded ${sponsor.logoStyle} flex items-center justify-center flex-shrink-0`}>
+                <span className="text-white font-bold text-[10px]">{sponsor.fallbackLogo}</span>
+              </div>
+            )}
+            <span className="text-xs font-semibold text-foreground">{sponsor.name}</span>
+            <span className="text-[10px] text-muted-foreground">•</span>
+            <span className="text-[10px] text-muted-foreground">{sponsor.tagline}</span>
+            <ExternalLink className="w-3 h-3 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
+            
+            {/* Separator */}
+            <span className="text-muted-foreground/30 ml-4">|</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 export const ToolAds = () => {
   return (
     <div className="w-full space-y-4">

@@ -9,7 +9,7 @@ import { MatchCard } from "./MatchCard";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import stackingBanner from "@/assets/stacking-banner.png";
 import { StackingDaoAd } from "./StackingDaoAd";
-import { ToolAds } from "./SponsorAds";
+import { ScrollingToolAds } from "./SponsorAds";
 import { Leaderboard } from "./Leaderboard";
 import { Navigation } from "./Navigation";
 import { supabase } from "@/integrations/supabase/client";
@@ -420,7 +420,11 @@ export const BracketGenerator = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--gradient-dark)] p-4 md:p-8 relative overflow-hidden">
+    <div className="min-h-screen bg-[var(--gradient-dark)] relative overflow-hidden">
+      {/* Scrolling Sponsor Ads at Top */}
+      <ScrollingToolAds />
+      
+      <div className="p-4 md:p-8">
       <Navigation />
       
       {/* Join Tournament Dialog */}
@@ -746,10 +750,7 @@ export const BracketGenerator = () => {
           </div>
         )}
 
-        {/* Bottom Sponsor Ads */}
-        <div className="mt-12 pt-8 border-t border-border/30 animate-fade-in">
-          <ToolAds />
-        </div>
+      </div>
       </div>
     </div>
   );
