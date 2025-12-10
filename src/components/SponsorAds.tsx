@@ -50,6 +50,54 @@ const sponsors: Sponsor[] = [
     color: "from-pink-500 to-rose-500",
     fallbackLogo: "D",
     logoStyle: "bg-gradient-to-br from-pink-500 to-rose-500"
+  },
+  {
+    name: "Hermetica",
+    tagline: "Bitcoin-backed stablecoin",
+    url: "https://portfolio.hermetica.fi",
+    color: "from-emerald-500 to-teal-600",
+    fallbackLogo: "H",
+    logoStyle: "bg-gradient-to-br from-emerald-500 to-teal-600"
+  },
+  {
+    name: "Ryder",
+    tagline: "Self-custody wallet",
+    url: "https://ryder.id",
+    color: "from-violet-500 to-purple-600",
+    fallbackLogo: "R",
+    logoStyle: "bg-gradient-to-br from-violet-500 to-purple-600"
+  },
+  {
+    name: "FAK",
+    tagline: "Fun on Stacks",
+    url: "https://fak.fun",
+    color: "from-red-500 to-orange-500",
+    fallbackLogo: "F",
+    logoStyle: "bg-gradient-to-br from-red-500 to-orange-500"
+  },
+  {
+    name: "Gamma",
+    tagline: "NFT marketplace",
+    url: "https://gamma.io",
+    color: "from-lime-500 to-green-600",
+    fallbackLogo: "G",
+    logoStyle: "bg-gradient-to-br from-lime-500 to-green-600"
+  },
+  {
+    name: "Bitflow",
+    tagline: "DeFi on Bitcoin",
+    url: "https://app.bitflow.finance",
+    color: "from-sky-500 to-blue-600",
+    fallbackLogo: "B",
+    logoStyle: "bg-gradient-to-br from-sky-500 to-blue-600"
+  },
+  {
+    name: "Zero Authority DAO",
+    tagline: "Decentralized governance",
+    url: "https://zeroauthouritydao.com",
+    color: "from-gray-600 to-slate-700",
+    fallbackLogo: "0",
+    logoStyle: "bg-gradient-to-br from-gray-600 to-slate-700"
   }
 ];
 
