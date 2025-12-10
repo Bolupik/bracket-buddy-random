@@ -2,6 +2,10 @@ import { ExternalLink } from "lucide-react";
 import stacksMentorLogo from "@/assets/sponsors/stacks-mentor-ai.ico";
 import boostxLogo from "@/assets/sponsors/boostx.png";
 import stxtoolsLogo from "@/assets/sponsors/stxtools.ico";
+import fakLogo from "@/assets/sponsors/fak.ico";
+import gammaLogo from "@/assets/sponsors/gamma.ico";
+import bitflowLogo from "@/assets/sponsors/bitflow.ico";
+import zeroAuthorityLogo from "@/assets/sponsors/zeroauthority.ico";
 
 interface Sponsor {
   name: string;
@@ -72,32 +76,28 @@ const sponsors: Sponsor[] = [
     tagline: "Fun on Stacks",
     url: "https://fak.fun",
     color: "from-red-500 to-orange-500",
-    fallbackLogo: "F",
-    logoStyle: "bg-gradient-to-br from-red-500 to-orange-500"
+    logo: fakLogo,
   },
   {
     name: "Gamma",
     tagline: "NFT marketplace",
     url: "https://gamma.io",
     color: "from-lime-500 to-green-600",
-    fallbackLogo: "G",
-    logoStyle: "bg-gradient-to-br from-lime-500 to-green-600"
+    logo: gammaLogo,
   },
   {
     name: "Bitflow",
     tagline: "DeFi on Bitcoin",
     url: "https://app.bitflow.finance",
     color: "from-sky-500 to-blue-600",
-    fallbackLogo: "B",
-    logoStyle: "bg-gradient-to-br from-sky-500 to-blue-600"
+    logo: bitflowLogo,
   },
   {
     name: "Zero Authority DAO",
     tagline: "Decentralized governance",
-    url: "https://zeroauthouritydao.com",
+    url: "https://zeroauthoritydao.com",
     color: "from-gray-600 to-slate-700",
-    fallbackLogo: "0",
-    logoStyle: "bg-gradient-to-br from-gray-600 to-slate-700"
+    logo: zeroAuthorityLogo,
   }
 ];
 
