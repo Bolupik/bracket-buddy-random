@@ -225,7 +225,7 @@ All colors MUST be HSL.
   }
   
   .animate-scroll-marquee {
-    animation: scroll-marquee 45s linear infinite;
+    animation: scroll-marquee 18s linear infinite;
   }
   
   .animate-scroll-marquee:hover {
