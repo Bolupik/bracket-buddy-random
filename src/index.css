@@ -225,7 +225,11 @@ All colors MUST be HSL.
   }
   
   .animate-scroll-marquee {
-    animation: scroll-marquee 30s linear infinite;
+    animation: scroll-marquee 45s linear infinite;
+  }
+  
+  .animate-scroll-marquee:hover {
+    animation-play-state: paused;
   }
   
   .gradient-text {
