@@ -1,6 +1,6 @@
 import { ExternalLink } from "lucide-react";
 import stacksMentorLogo from "@/assets/sponsors/stacks-mentor-ai.ico";
-import boostxLogo from "@/assets/sponsors/boostx.ico";
+import boostxLogo from "@/assets/sponsors/boostx.png";
 import stxtoolsLogo from "@/assets/sponsors/stxtools.ico";
 
 interface Sponsor {
