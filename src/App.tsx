@@ -14,6 +14,7 @@ import TournamentBrowserPage from "./pages/TournamentBrowserPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import SchedulePage from "./pages/SchedulePage";
 import AvailabilityPage from "./pages/AvailabilityPage";
+import ToolsPage from "./pages/ToolsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +37,7 @@ const App = () => (
           <Route path="/availability" element={<AvailabilityPage />} />
           <Route path="/wheel" element={<WheelPage />} />
           <Route path="/random-wheel" element={<RandomWheelPage />} />
+          <Route path="/tools" element={<ToolsPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
