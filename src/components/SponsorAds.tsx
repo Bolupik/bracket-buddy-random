@@ -98,6 +98,30 @@ const sponsors: Sponsor[] = [
     url: "https://zeroauthoritydao.com",
     color: "from-gray-600 to-slate-700",
     logo: zeroAuthorityLogo,
+  },
+  {
+    name: "Velar",
+    tagline: "DeFi Hub",
+    url: "https://velar.com",
+    color: "from-indigo-500 to-violet-600",
+    fallbackLogo: "V",
+    logoStyle: "bg-gradient-to-br from-indigo-500 to-violet-600"
+  },
+  {
+    name: "ALEX",
+    tagline: "Bitcoin DeFi",
+    url: "https://alex.io",
+    color: "from-amber-500 to-orange-600",
+    fallbackLogo: "A",
+    logoStyle: "bg-gradient-to-br from-amber-500 to-orange-600"
+  },
+  {
+    name: "Arkadiko",
+    tagline: "Stablecoin Protocol",
+    url: "https://arkadiko.finance",
+    color: "from-cyan-500 to-blue-600",
+    fallbackLogo: "Ak",
+    logoStyle: "bg-gradient-to-br from-cyan-500 to-blue-600"
   }
 ];
 
