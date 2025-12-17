@@ -10,6 +10,10 @@ import zeroAuthorityLogo from "@/assets/sponsors/zeroauthority.ico";
 import velarLogo from "@/assets/sponsors/velar.jpg";
 import alexLogo from "@/assets/sponsors/alex.jpg";
 import arkadikoLogo from "@/assets/sponsors/arkadiko.jpg";
+import ryderLogo from "@/assets/sponsors/ryder.png";
+import hermeticaLogo from "@/assets/sponsors/hermetica.jpg";
+import deorganizedLogo from "@/assets/sponsors/deorganized.jpg";
+import zestLogo from "@/assets/sponsors/zest.jpg";
 
 interface Sponsor {
   name: string;
@@ -41,8 +45,7 @@ const sponsors: Sponsor[] = [
     tagline: "DeFi lending on Bitcoin",
     url: "https://app.zestprotocol.com",
     color: "from-yellow-500 to-amber-600",
-    fallbackLogo: "Z",
-    logoStyle: "bg-gradient-to-br from-yellow-400 to-amber-600"
+    logo: zestLogo,
   },
   {
     name: "STX Tools",
@@ -56,24 +59,21 @@ const sponsors: Sponsor[] = [
     tagline: "Web3 media & insights",
     url: "https://deorganized.media",
     color: "from-pink-500 to-rose-500",
-    fallbackLogo: "D",
-    logoStyle: "bg-gradient-to-br from-pink-500 to-rose-500"
+    logo: deorganizedLogo,
   },
   {
     name: "Hermetica",
     tagline: "Bitcoin-backed stablecoin",
     url: "https://portfolio.hermetica.fi",
     color: "from-emerald-500 to-teal-600",
-    fallbackLogo: "H",
-    logoStyle: "bg-gradient-to-br from-emerald-500 to-teal-600"
+    logo: hermeticaLogo,
   },
   {
     name: "Ryder",
     tagline: "Self-custody wallet",
     url: "https://ryder.id",
     color: "from-violet-500 to-purple-600",
-    fallbackLogo: "R",
-    logoStyle: "bg-gradient-to-br from-violet-500 to-purple-600"
+    logo: ryderLogo,
   },
   {
     name: "FAK",
