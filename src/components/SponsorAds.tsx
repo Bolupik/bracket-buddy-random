@@ -1,10 +1,10 @@
 import { ExternalLink, Grid3X3 } from "lucide-react";
 import { Link } from "react-router-dom";
-import stacksMentorLogo from "@/assets/sponsors/stacks-mentor-ai.ico";
+import stacksMentorLogo from "@/assets/sponsors/stacks-mentor-ai.png";
 import boostxLogo from "@/assets/sponsors/boostx.png";
 import stxtoolsLogo from "@/assets/sponsors/stxtools.ico";
-import fakLogo from "@/assets/sponsors/fak.ico";
-import gammaLogo from "@/assets/sponsors/gamma.ico";
+import fakLogo from "@/assets/sponsors/fak.jpg";
+import gammaLogo from "@/assets/sponsors/gamma.jpg";
 import bitflowLogo from "@/assets/sponsors/bitflow.ico";
 import zeroAuthorityLogo from "@/assets/sponsors/zeroauthority.ico";
 import velarLogo from "@/assets/sponsors/velar.jpg";
