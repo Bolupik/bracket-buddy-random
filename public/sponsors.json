@@ -1,0 +1,86 @@
+[
+  {
+    "name": "Stacks Mentor AI",
+    "tagline": "AI-powered learning for Stacks",
+    "url": "https://stacks-mentor-ai.lovable.app",
+    "logo": "stacks-mentor-ai.png"
+  },
+  {
+    "name": "BoostX",
+    "tagline": "Amplify your crypto journey",
+    "url": "https://boostx.cc/",
+    "logo": "boostx.png"
+  },
+  {
+    "name": "Zest Protocol",
+    "tagline": "DeFi lending on Bitcoin",
+    "url": "https://app.zestprotocol.com",
+    "logo": "zest.jpg"
+  },
+  {
+    "name": "STX Tools",
+    "tagline": "Essential Stacks analytics",
+    "url": "https://stxtools.io/",
+    "logo": "stxtools.ico"
+  },
+  {
+    "name": "Deorganized",
+    "tagline": "Web3 media & insights",
+    "url": "https://deorganized.media",
+    "logo": "deorganized.jpg"
+  },
+  {
+    "name": "Hermetica",
+    "tagline": "Bitcoin-backed stablecoin",
+    "url": "https://portfolio.hermetica.fi",
+    "logo": "hermetica.jpg"
+  },
+  {
+    "name": "Ryder",
+    "tagline": "Self-custody wallet",
+    "url": "https://ryder.id",
+    "logo": "ryder.png"
+  },
+  {
+    "name": "FAK",
+    "tagline": "Fun on Stacks",
+    "url": "https://fak.fun",
+    "logo": "fak.jpg"
+  },
+  {
+    "name": "Gamma",
+    "tagline": "NFT marketplace",
+    "url": "https://gamma.io",
+    "logo": "gamma.jpg"
+  },
+  {
+    "name": "Bitflow",
+    "tagline": "DeFi on Bitcoin",
+    "url": "https://app.bitflow.finance",
+    "logo": "bitflow.ico"
+  },
+  {
+    "name": "Zero Authority DAO",
+    "tagline": "Decentralized governance",
+    "url": "https://zeroauthoritydao.com",
+    "logo": "zeroauthority.ico"
+  },
+  {
+    "name": "Velar",
+    "tagline": "DeFi Hub",
+    "url": "https://velar.com",
+    "logo": "velar.jpg"
+  },
+  {
+    "name": "ALEX",
+    "tagline": "Bitcoin DeFi",
+    "url": "https://alex.io",
+    "logo": "alex.jpg"
+  },
+  {
+    "name": "Arkadiko",
+    "tagline": "Stablecoin Protocol",
+    "url": "https://arkadiko.finance",
+    "logo": "arkadiko.jpg"
+  }
+]
