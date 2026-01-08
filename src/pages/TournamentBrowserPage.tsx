@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Navigation } from "@/components/Navigation";
 import { Trophy, Users, Calendar, LogOut } from "lucide-react";
 import { Session } from "@supabase/supabase-js";
+import { RegistrationCountdown, canRegister } from "@/components/RegistrationCountdown";
 
 interface Tournament {
   id: string;
@@ -16,6 +17,9 @@ interface Tournament {
   max_participants: number;
   registered_users: any;
   created_at: string;
+  registration_open_at: string | null;
+  registration_close_at: string | null;
+  tournament_start_at: string | null;
 }
 
 const TournamentBrowserPage = () => {
@@ -63,16 +67,19 @@ const TournamentBrowserPage = () => {
     }
   };
 
-  const handleRegister = async (tournamentId: string) => {
+  const handleRegister = async (tournament: Tournament) => {
     if (!session?.user) {
       toast.error("Please sign in to register");
       return;
     }
 
-    try {
-      const tournament = tournaments.find(t => t.id === tournamentId);
-      if (!tournament) return;
+    // Check registration window
+    if (!canRegister(tournament.registration_open_at, tournament.registration_close_at)) {
+      toast.error("Registration is not currently open for this tournament");
+      return;
+    }
 
+    try {
       const registeredUsers = Array.isArray(tournament.registered_users) ? tournament.registered_users : [];
       
       if (registeredUsers.some((u: any) => u.id === session.user.id)) {
@@ -90,9 +97,17 @@ const TournamentBrowserPage = () => {
         .update({
           registered_users: [...registeredUsers, { id: session.user.id, email: session.user.email }]
         })
-        .eq("id", tournamentId);
+        .eq("id", tournament.id);
 
-      if (error) throw error;
+      if (error) {
+        // Check if it's an RLS error (registration window closed on server side)
+        if (error.code === "42501" || error.message.includes("policy")) {
+          toast.error("Registration window has closed");
+          fetchTournaments();
+          return;
+        }
+        throw error;
+      }
 
       toast.success("Successfully registered!");
       fetchTournaments();
@@ -151,40 +166,57 @@ const TournamentBrowserPage = () => {
               const registeredUsers = Array.isArray(tournament.registered_users) ? tournament.registered_users : [];
               const registeredCount = registeredUsers.length;
               const isRegistered = session?.user && registeredUsers.some((u: any) => u.id === session.user.id);
+              const registrationOpen = canRegister(tournament.registration_open_at, tournament.registration_close_at);
+              const isFull = registeredCount >= tournament.max_participants;
               
               return (
                 <Card
                   key={tournament.id}
                   className="p-6 backdrop-blur-lg border-2 border-primary/30 hover:border-primary/50 transition-all"
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-3">
-                        <h3 className="text-2xl font-bold">{tournament.name}</h3>
-                        <Badge variant={isRegistered ? "default" : "secondary"}>
-                          {isRegistered ? "Registered" : "Open"}
-                        </Badge>
+                  <div className="space-y-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-3">
+                          <h3 className="text-2xl font-bold">{tournament.name}</h3>
+                          <Badge variant={isRegistered ? "default" : "secondary"}>
+                            {isRegistered ? "Registered" : "Open"}
+                          </Badge>
+                        </div>
+                        
+                        <div className="flex gap-6 text-sm text-muted-foreground mb-4">
+                          <div className="flex items-center gap-2">
+                            <Users className="w-4 h-4" />
+                            {registeredCount} / {tournament.max_participants} players
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Calendar className="w-4 h-4" />
+                            {new Date(tournament.created_at).toLocaleDateString()}
+                          </div>
+                        </div>
                       </div>
                       
-                      <div className="flex gap-6 text-sm text-muted-foreground mb-4">
-                        <div className="flex items-center gap-2">
-                          <Users className="w-4 h-4" />
-                          {registeredCount} / {tournament.max_participants} players
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Calendar className="w-4 h-4" />
-                          {new Date(tournament.created_at).toLocaleDateString()}
-                        </div>
-                      </div>
+                      <Button
+                        onClick={() => handleRegister(tournament)}
+                        disabled={isRegistered || isFull || !registrationOpen}
+                        variant={isRegistered ? "outline" : "gradient"}
+                      >
+                        {isRegistered 
+                          ? "Registered ✓" 
+                          : isFull 
+                            ? "Full" 
+                            : !registrationOpen 
+                              ? "Closed" 
+                              : "Register"}
+                      </Button>
                     </div>
                     
-                    <Button
-                      onClick={() => handleRegister(tournament.id)}
-                      disabled={isRegistered || registeredCount >= tournament.max_participants}
-                      variant={isRegistered ? "outline" : "gradient"}
-                    >
-                      {isRegistered ? "Registered ✓" : registeredCount >= tournament.max_participants ? "Full" : "Register"}
-                    </Button>
+                    {/* Registration Countdown */}
+                    <RegistrationCountdown
+                      registrationOpenAt={tournament.registration_open_at}
+                      registrationCloseAt={tournament.registration_close_at}
+                      tournamentStartAt={tournament.tournament_start_at}
+                    />
                   </div>
                 </Card>
               );
