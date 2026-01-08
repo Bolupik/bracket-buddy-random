@@ -5,9 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Trophy, Users, Share2, Upload, Trash2, Shuffle } from "lucide-react";
+import { Trophy, Users, Share2, Upload, Trash2, Shuffle, CalendarClock } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { DateTimePicker } from "@/components/DateTimePicker";
 
 interface Participant {
   name: string;
@@ -33,6 +34,9 @@ const CreateTournamentPage = () => {
   const [currentName, setCurrentName] = useState("");
   const [currentImage, setCurrentImage] = useState<string | undefined>();
   const [isCreating, setIsCreating] = useState(false);
+  const [registrationOpenAt, setRegistrationOpenAt] = useState<Date | undefined>();
+  const [registrationCloseAt, setRegistrationCloseAt] = useState<Date | undefined>();
+  const [tournamentStartAt, setTournamentStartAt] = useState<Date | undefined>();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
@@ -162,7 +166,10 @@ const CreateTournamentPage = () => {
           name: tournamentName,
           creator_id: creatorId,
           participants: participants as any,
-          matchups: matchups as any
+          matchups: matchups as any,
+          registration_open_at: registrationOpenAt?.toISOString() || null,
+          registration_close_at: registrationCloseAt?.toISOString() || null,
+          tournament_start_at: tournamentStartAt?.toISOString() || null,
         })
         .select()
         .single();
@@ -323,6 +330,41 @@ const CreateTournamentPage = () => {
                 )}
               </div>
 
+              {/* Registration Schedule Section */}
+              <div className="space-y-4 pt-4 border-t-2 border-primary/20">
+                <h3 className="text-xl font-bold flex items-center gap-2">
+                  <CalendarClock className="w-6 h-6 text-primary" />
+                  Registration Schedule (Optional)
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Set specific times for when players can register. Leave empty for open registration.
+                </p>
+                
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <DateTimePicker
+                    label="Registration Opens"
+                    value={registrationOpenAt}
+                    onChange={setRegistrationOpenAt}
+                    placeholder="Select open date/time"
+                  />
+                  <DateTimePicker
+                    label="Registration Closes"
+                    value={registrationCloseAt}
+                    onChange={setRegistrationCloseAt}
+                    placeholder="Select close date/time"
+                    minDate={registrationOpenAt}
+                  />
+                </div>
+                
+                <DateTimePicker
+                  label="Tournament Start Time"
+                  value={tournamentStartAt}
+                  onChange={setTournamentStartAt}
+                  placeholder="When does the tournament begin?"
+                  minDate={registrationCloseAt || registrationOpenAt}
+                />
+              </div>
+
               {/* Info Box */}
               <div className="bg-primary/5 border-2 border-primary/20 rounded-lg p-4">
                 <div className="flex gap-3">
@@ -333,6 +375,7 @@ const CreateTournamentPage = () => {
                       <li>✨ Tournament matchups will be generated</li>
                       <li>👥 Others can join using your shareable link</li>
                       <li>🎮 Only you can manage the tournament</li>
+                      <li>⏰ Registration window will be enforced automatically</li>
                     </ul>
                   </div>
                 </div>

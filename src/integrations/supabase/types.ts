@@ -192,8 +192,11 @@ export type Database = {
           name: string
           participants: Json
           registered_users: Json | null
+          registration_close_at: string | null
+          registration_open_at: string | null
           start_date: string | null
           status: string | null
+          tournament_start_at: string | null
           updated_at: string
         }
         Insert: {
@@ -205,8 +208,11 @@ export type Database = {
           name: string
           participants: Json
           registered_users?: Json | null
+          registration_close_at?: string | null
+          registration_open_at?: string | null
           start_date?: string | null
           status?: string | null
+          tournament_start_at?: string | null
           updated_at?: string
         }
         Update: {
@@ -218,8 +224,11 @@ export type Database = {
           name?: string
           participants?: Json
           registered_users?: Json | null
+          registration_close_at?: string | null
+          registration_open_at?: string | null
           start_date?: string | null
           status?: string | null
+          tournament_start_at?: string | null
           updated_at?: string
         }
         Relationships: []
