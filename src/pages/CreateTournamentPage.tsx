@@ -182,8 +182,8 @@ const CreateTournamentPage = () => {
 
       toast.success("Tournament created! 🎉");
       
-      // Navigate to the tournament page
-      navigate(`/?tournament=${data.id}`);
+      // Navigate to the tournament registration page
+      navigate(`/tournament/${data.id}`);
     } catch (error) {
       console.error("Error creating tournament:", error);
       toast.error("Failed to create tournament");

@@ -358,9 +358,10 @@ export const BracketGenerator = () => {
       return;
     }
     
-    const url = `${window.location.origin}/?tournament=${tournamentId}`;
+    // Use the new registration page URL
+    const url = `${window.location.origin}/tournament/${tournamentId}`;
     navigator.clipboard.writeText(url);
-    toast.success("Shareable tournament link copied to clipboard! 🔗");
+    toast.success("Registration link copied to clipboard! 🔗");
   };
 
   const sendEmailBackup = async () => {
@@ -654,7 +655,7 @@ export const BracketGenerator = () => {
                 className="h-20 text-lg font-bold"
               >
                 <Share2 className="w-6 h-6 mr-2" />
-                🔗 Share Link
+                📋 Copy Registration Link
               </Button>
               <Button
                 onClick={sendEmailBackup}
