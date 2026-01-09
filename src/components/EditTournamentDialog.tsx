@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -11,7 +12,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { DateTimePicker } from "@/components/DateTimePicker";
-import { Pencil, Save, Trophy, Users, CalendarClock } from "lucide-react";
+import { Pencil, Save, Trophy, Users, CalendarClock, Mail } from "lucide-react";
 
 interface Tournament {
   id: string;
@@ -60,6 +61,36 @@ export const EditTournamentDialog = ({
     );
   }, [tournament]);
 
+  const [notifyParticipants, setNotifyParticipants] = useState(true);
+
+  const sendNotification = async (tournamentId: string, subject: string, message: string) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/notify-tournament-update`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({
+            tournamentId,
+            subject,
+            message,
+          }),
+        }
+      );
+
+      const result = await response.json();
+      if (result.emailsSent > 0) {
+        toast.success(`📧 Notified ${result.emailsSent} participant(s)`);
+      }
+      return result;
+    } catch (error) {
+      console.error("Failed to send notifications:", error);
+    }
+  };
+
   const handleSave = async () => {
     if (!name.trim()) {
       toast.error("Tournament name is required");
@@ -85,6 +116,23 @@ export const EditTournamentDialog = ({
         .eq("id", tournament.id);
 
       if (error) throw error;
+
+      // Send notification if enabled
+      if (notifyParticipants) {
+        const changes: string[] = [];
+        if (name.trim() !== tournament.name) changes.push("tournament name");
+        if (maxParticipants !== tournament.max_participants) changes.push("participant limit");
+        if (registrationOpenAt?.toISOString() !== tournament.registration_open_at) changes.push("registration open time");
+        if (registrationCloseAt?.toISOString() !== tournament.registration_close_at) changes.push("registration close time");
+        if (tournamentStartAt?.toISOString() !== tournament.tournament_start_at) changes.push("tournament start time");
+
+        if (changes.length > 0) {
+          const message = `The tournament details have been updated. Changes: ${changes.join(", ")}.${
+            tournamentStartAt ? ` The tournament starts on ${new Date(tournamentStartAt).toLocaleString()}.` : ""
+          }`;
+          await sendNotification(tournament.id, "Tournament Updated", message);
+        }
+      }
 
       toast.success("Tournament updated! ✨");
       setOpen(false);
@@ -172,6 +220,22 @@ export const EditTournamentDialog = ({
                 minDate={registrationCloseAt || registrationOpenAt}
               />
             </div>
+          </div>
+
+          {/* Notify Participants */}
+          <div className="flex items-center space-x-3 pt-4 border-t border-border">
+            <Checkbox
+              id="notify"
+              checked={notifyParticipants}
+              onCheckedChange={(checked) => setNotifyParticipants(checked === true)}
+            />
+            <label
+              htmlFor="notify"
+              className="flex items-center gap-2 text-sm font-medium cursor-pointer"
+            >
+              <Mail className="w-4 h-4 text-primary" />
+              Email participants about changes
+            </label>
           </div>
         </div>
 
