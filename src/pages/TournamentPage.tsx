@@ -9,6 +9,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import { Navigation } from "@/components/Navigation";
 import { RegistrationCountdown, canRegister } from "@/components/RegistrationCountdown";
+import { EditTournamentDialog } from "@/components/EditTournamentDialog";
 import { 
   Trophy, 
   Users, 
@@ -264,6 +265,10 @@ const TournamentPage = () => {
             {/* Admin Actions */}
             {isCreator && (
               <div className="flex flex-col gap-3">
+                <EditTournamentDialog
+                  tournament={tournament}
+                  onUpdate={() => fetchTournament(tournament.id)}
+                />
                 <Button onClick={copyRegistrationLink} variant="outline" className="gap-2">
                   {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                   {copied ? "Copied!" : "Copy Registration Link"}
