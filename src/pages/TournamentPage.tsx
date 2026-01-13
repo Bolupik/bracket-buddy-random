@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { Navigation } from "@/components/Navigation";
 import { RegistrationCountdown, canRegister } from "@/components/RegistrationCountdown";
 import { EditTournamentDialog } from "@/components/EditTournamentDialog";
+import { SendAnnouncementDialog } from "@/components/SendAnnouncementDialog";
 import { 
   Trophy, 
   Users, 
@@ -260,6 +261,7 @@ const TournamentPage = () => {
     ? tournament.participants 
     : [];
   const participantCount = participants.length;
+  const emailCount = participants.filter((p) => p.email && p.email.includes("@")).length;
   const isFull = participantCount >= tournament.max_participants;
   const registrationOpen = canRegister(tournament.registration_open_at, tournament.registration_close_at);
   const hasMatchups = tournament.matchups && Array.isArray(tournament.matchups) && tournament.matchups.length > 0;
@@ -313,6 +315,12 @@ const TournamentPage = () => {
                 <EditTournamentDialog
                   tournament={tournament}
                   onUpdate={() => fetchTournament(tournament.id)}
+                />
+                <SendAnnouncementDialog
+                  tournamentId={tournament.id}
+                  tournamentName={tournament.name}
+                  participantCount={participantCount}
+                  emailCount={emailCount}
                 />
                 <Button onClick={copyRegistrationLink} variant="outline" className="gap-2">
                   {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
