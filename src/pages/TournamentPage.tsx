@@ -192,8 +192,23 @@ const TournamentPage = () => {
       // Save to localStorage so they're recognized
       localStorage.setItem(`tournament_${tournament.id}_user`, trimmedName);
 
+      // Send confirmation email (non-blocking)
+      if (trimmedEmail) {
+        supabase.functions.invoke("send-registration-confirmation", {
+          body: {
+            participantName: trimmedName,
+            participantEmail: trimmedEmail,
+            tournamentName: tournament.name,
+            tournamentId: tournament.id,
+            tournamentStartAt: tournament.tournament_start_at,
+            participantCount: updatedParticipants.length,
+            maxParticipants: tournament.max_participants,
+          },
+        }).catch((err) => console.error("Failed to send confirmation email:", err));
+      }
+
       toast.success(`🎉 Welcome to ${tournament.name}, ${trimmedName}!`, {
-        description: trimmedEmail ? "You'll receive reminder emails before the tournament starts." : undefined,
+        description: trimmedEmail ? "Check your email for confirmation!" : undefined,
       });
       setParticipantName("");
       setParticipantEmail("");
