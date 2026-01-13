@@ -42,6 +42,12 @@ interface Participant {
   email?: string;
 }
 
+// Email validation helper
+const isValidEmail = (email: string): boolean => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
 const TournamentPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -109,8 +115,23 @@ const TournamentPage = () => {
   };
 
   const handleJoinTournament = async () => {
-    if (!tournament || !participantName.trim()) {
+    const trimmedName = participantName.trim();
+    const trimmedEmail = participantEmail.trim();
+
+    if (!tournament || !trimmedName) {
       toast.error("Please enter your name");
+      return;
+    }
+
+    // Validate name length
+    if (trimmedName.length < 2) {
+      toast.error("Name must be at least 2 characters");
+      return;
+    }
+
+    // Validate email if provided
+    if (trimmedEmail && !isValidEmail(trimmedEmail)) {
+      toast.error("Please enter a valid email address");
       return;
     }
 
@@ -124,9 +145,15 @@ const TournamentPage = () => {
       ? tournament.participants 
       : [];
 
-    // Check if name already exists
-    if (participants.some((p) => p.name.toLowerCase() === participantName.trim().toLowerCase())) {
+    // Check if name already exists (case-insensitive)
+    if (participants.some((p) => p.name.toLowerCase() === trimmedName.toLowerCase())) {
       toast.error("This name is already registered!");
+      return;
+    }
+
+    // Check if email already registered (if provided)
+    if (trimmedEmail && participants.some((p) => p.email?.toLowerCase() === trimmedEmail.toLowerCase())) {
+      toast.error("This email is already registered!");
       return;
     }
 
@@ -139,8 +166,8 @@ const TournamentPage = () => {
     setSubmitting(true);
     try {
       const newParticipant: Participant = {
-        name: participantName.trim(),
-        email: participantEmail.trim() || undefined,
+        name: trimmedName,
+        email: trimmedEmail || undefined,
       };
 
       const updatedParticipants = [...participants, newParticipant];
@@ -163,13 +190,16 @@ const TournamentPage = () => {
       }
 
       // Save to localStorage so they're recognized
-      localStorage.setItem(`tournament_${tournament.id}_user`, participantName.trim());
+      localStorage.setItem(`tournament_${tournament.id}_user`, trimmedName);
 
-      toast.success(`🎉 Welcome to ${tournament.name}, ${participantName.trim()}!`);
+      toast.success(`🎉 Welcome to ${tournament.name}, ${trimmedName}!`, {
+        description: trimmedEmail ? "You'll receive reminder emails before the tournament starts." : undefined,
+      });
       setParticipantName("");
       setParticipantEmail("");
       fetchTournament(tournament.id);
     } catch (error: any) {
+      console.error("Registration error:", error);
       toast.error(error.message || "Failed to join tournament");
     } finally {
       setSubmitting(false);
@@ -327,16 +357,20 @@ const TournamentPage = () => {
                       placeholder="Enter your name..."
                       value={participantName}
                       onChange={(e) => setParticipantName(e.target.value)}
-                      onKeyPress={(e) => e.key === "Enter" && handleJoinTournament()}
+                      onKeyDown={(e) => e.key === "Enter" && !submitting && participantName.trim() && handleJoinTournament()}
                       className="pl-10"
                       maxLength={50}
+                      disabled={submitting}
                     />
                   </div>
+                  {participantName.trim().length > 0 && participantName.trim().length < 2 && (
+                    <p className="text-xs text-destructive mt-1">Name must be at least 2 characters</p>
+                  )}
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Email (optional)
+                    Email (recommended)
                   </label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -347,16 +381,20 @@ const TournamentPage = () => {
                       onChange={(e) => setParticipantEmail(e.target.value)}
                       className="pl-10"
                       maxLength={100}
+                      disabled={submitting}
                     />
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    For tournament updates (not required)
+                    📧 Get reminders before the tournament starts!
                   </p>
+                  {participantEmail && !isValidEmail(participantEmail) && (
+                    <p className="text-xs text-destructive mt-1">Please enter a valid email address</p>
+                  )}
                 </div>
 
                 <Button
                   onClick={handleJoinTournament}
-                  disabled={!participantName.trim() || submitting}
+                  disabled={!participantName.trim() || participantName.trim().length < 2 || submitting || (participantEmail && !isValidEmail(participantEmail))}
                   variant="gradient"
                   size="lg"
                   className="w-full"

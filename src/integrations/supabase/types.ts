@@ -194,6 +194,7 @@ export type Database = {
           registered_users: Json | null
           registration_close_at: string | null
           registration_open_at: string | null
+          reminders_sent: Json | null
           start_date: string | null
           status: string | null
           tournament_start_at: string | null
@@ -210,6 +211,7 @@ export type Database = {
           registered_users?: Json | null
           registration_close_at?: string | null
           registration_open_at?: string | null
+          reminders_sent?: Json | null
           start_date?: string | null
           status?: string | null
           tournament_start_at?: string | null
@@ -226,6 +228,7 @@ export type Database = {
           registered_users?: Json | null
           registration_close_at?: string | null
           registration_open_at?: string | null
+          reminders_sent?: Json | null
           start_date?: string | null
           status?: string | null
           tournament_start_at?: string | null
@@ -266,6 +269,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      trigger_tournament_reminders: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "user"
