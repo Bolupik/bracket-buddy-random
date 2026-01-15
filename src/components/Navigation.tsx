@@ -39,8 +39,8 @@ export const Navigation = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <nav className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-[var(--gradient-card)] backdrop-blur-xl border-2 border-primary/40 rounded-full px-6 py-3 shadow-[var(--shadow-elegant)] animate-fade-in">
-      <div className="flex items-center gap-2">
+    <nav className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-[var(--gradient-card)] backdrop-blur-xl border-2 border-primary/40 rounded-full px-6 py-3 shadow-[var(--shadow-elegant)] animate-slide-down hover:shadow-[var(--shadow-intense)] transition-shadow duration-300">
+      <div className="flex items-center gap-2 stagger-children">
         {session && <NotificationBell />}
         
         <Link to="/">
