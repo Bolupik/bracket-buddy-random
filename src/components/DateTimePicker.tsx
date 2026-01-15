@@ -27,11 +27,13 @@ interface DateTimePickerProps {
 }
 
 const TIME_PRESETS = [
-  { label: "9:00 AM", hours: 9, minutes: 0 },
-  { label: "12:00 PM", hours: 12, minutes: 0 },
-  { label: "3:00 PM", hours: 15, minutes: 0 },
-  { label: "6:00 PM", hours: 18, minutes: 0 },
-  { label: "8:00 PM", hours: 20, minutes: 0 },
+  { label: "9:00", hours: 9, minutes: 0 },
+  { label: "10:00", hours: 10, minutes: 0 },
+  { label: "12:00", hours: 12, minutes: 0 },
+  { label: "14:00", hours: 14, minutes: 0 },
+  { label: "17:00", hours: 17, minutes: 0 },
+  { label: "18:00", hours: 18, minutes: 0 },
+  { label: "20:00", hours: 20, minutes: 0 },
 ];
 
 export function DateTimePicker({
@@ -134,9 +136,14 @@ export function DateTimePicker({
               </SelectTrigger>
               <SelectContent>
                 {Array.from({ length: 24 }, (_, h) => (
-                  <SelectItem key={h} value={`${h}:0`}>
-                    {h.toString().padStart(2, "0")}:00 UTC
-                  </SelectItem>
+                  <React.Fragment key={h}>
+                    <SelectItem value={`${h}:0`}>
+                      {h.toString().padStart(2, "0")}:00 UTC
+                    </SelectItem>
+                    <SelectItem value={`${h}:30`}>
+                      {h.toString().padStart(2, "0")}:30 UTC
+                    </SelectItem>
+                  </React.Fragment>
                 ))}
               </SelectContent>
             </Select>
