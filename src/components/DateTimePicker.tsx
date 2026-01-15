@@ -1,6 +1,6 @@
 import * as React from "react";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -68,6 +68,11 @@ export function DateTimePicker({
     onChange(newDate);
   };
 
+  const handleNow = () => {
+    const now = new Date();
+    onChange(now);
+  };
+
   const currentTimeLabel = value
     ? `${value.getUTCHours().toString().padStart(2, "0")}:${value.getUTCMinutes().toString().padStart(2, "0")} UTC`
     : "Select time";
@@ -105,7 +110,18 @@ export function DateTimePicker({
             className="p-3 pointer-events-auto"
           />
           <div className="border-t p-3 space-y-3">
-            <div className="text-sm font-medium text-muted-foreground">Quick Time (UTC)</div>
+            <div className="flex items-center justify-between">
+              <div className="text-sm font-medium text-muted-foreground">Quick Time (UTC)</div>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={handleNow}
+                className="text-xs gap-1"
+              >
+                <Clock className="h-3 w-3" />
+                Now
+              </Button>
+            </div>
             <div className="flex flex-wrap gap-2">
               {TIME_PRESETS.map((preset) => (
                 <Button
