@@ -1,6 +1,6 @@
 import * as React from "react";
 import { format } from "date-fns";
-import { CalendarIcon, Clock } from "lucide-react";
+import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -9,7 +9,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface DateTimePickerProps {
   value: Date | undefined;
@@ -20,6 +26,14 @@ interface DateTimePickerProps {
   minDate?: Date;
 }
 
+const TIME_PRESETS = [
+  { label: "9:00 AM", hours: 9, minutes: 0 },
+  { label: "12:00 PM", hours: 12, minutes: 0 },
+  { label: "3:00 PM", hours: 15, minutes: 0 },
+  { label: "6:00 PM", hours: 18, minutes: 0 },
+  { label: "8:00 PM", hours: 20, minutes: 0 },
+];
+
 export function DateTimePicker({
   value,
   onChange,
@@ -29,10 +43,6 @@ export function DateTimePicker({
   minDate,
 }: DateTimePickerProps) {
   const [isOpen, setIsOpen] = React.useState(false);
-  
-  // Extract time from value or use defaults
-  const hours = value ? value.getUTCHours().toString().padStart(2, "0") : "12";
-  const minutes = value ? value.getUTCMinutes().toString().padStart(2, "0") : "00";
 
   const handleDateSelect = (selectedDate: Date | undefined) => {
     if (!selectedDate) {
@@ -40,7 +50,6 @@ export function DateTimePicker({
       return;
     }
 
-    // Preserve existing time or use default
     const newDate = new Date(selectedDate);
     if (value) {
       newDate.setUTCHours(value.getUTCHours(), value.getUTCMinutes(), 0, 0);
@@ -50,23 +59,16 @@ export function DateTimePicker({
     onChange(newDate);
   };
 
-  const handleTimeChange = (type: "hours" | "minutes", val: string) => {
-    const num = parseInt(val, 10);
-    if (isNaN(num)) return;
-
+  const handleTimePreset = (hours: number, minutes: number) => {
     const baseDate = value || new Date();
     const newDate = new Date(baseDate);
-
-    if (type === "hours") {
-      const clampedHours = Math.min(23, Math.max(0, num));
-      newDate.setUTCHours(clampedHours, newDate.getUTCMinutes(), 0, 0);
-    } else {
-      const clampedMinutes = Math.min(59, Math.max(0, num));
-      newDate.setUTCHours(newDate.getUTCHours(), clampedMinutes, 0, 0);
-    }
-
+    newDate.setUTCHours(hours, minutes, 0, 0);
     onChange(newDate);
   };
+
+  const currentTimeLabel = value
+    ? `${value.getUTCHours().toString().padStart(2, "0")}:${value.getUTCMinutes().toString().padStart(2, "0")} UTC`
+    : "Select time";
 
   return (
     <div className="space-y-2">
@@ -101,31 +103,43 @@ export function DateTimePicker({
             className="p-3 pointer-events-auto"
           />
           <div className="border-t p-3 space-y-3">
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm font-medium">Time (UTC)</span>
+            <div className="text-sm font-medium text-muted-foreground">Quick Time (UTC)</div>
+            <div className="flex flex-wrap gap-2">
+              {TIME_PRESETS.map((preset) => (
+                <Button
+                  key={preset.label}
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleTimePreset(preset.hours, preset.minutes)}
+                  className={cn(
+                    "text-xs",
+                    value && value.getUTCHours() === preset.hours && value.getUTCMinutes() === preset.minutes
+                      ? "bg-primary text-primary-foreground"
+                      : ""
+                  )}
+                >
+                  {preset.label}
+                </Button>
+              ))}
             </div>
-            <div className="flex items-center gap-2">
-              <Input
-                type="number"
-                min="0"
-                max="23"
-                value={hours}
-                onChange={(e) => handleTimeChange("hours", e.target.value)}
-                className="w-16 text-center"
-                placeholder="HH"
-              />
-              <span className="text-xl font-bold">:</span>
-              <Input
-                type="number"
-                min="0"
-                max="59"
-                value={minutes}
-                onChange={(e) => handleTimeChange("minutes", e.target.value)}
-                className="w-16 text-center"
-                placeholder="MM"
-              />
-            </div>
+            <Select
+              value={value ? `${value.getUTCHours()}:${value.getUTCMinutes()}` : undefined}
+              onValueChange={(val) => {
+                const [h, m] = val.split(":").map(Number);
+                handleTimePreset(h, m);
+              }}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Or select custom time" />
+              </SelectTrigger>
+              <SelectContent>
+                {Array.from({ length: 24 }, (_, h) => (
+                  <SelectItem key={h} value={`${h}:0`}>
+                    {h.toString().padStart(2, "0")}:00 UTC
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="border-t p-3">
             <Button
