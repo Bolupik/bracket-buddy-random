@@ -79,20 +79,20 @@ const CreateTournamentPage = () => {
         <div className="animate-fade-in">
           {/* Header */}
           <div className="text-center mb-10">
-            <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-[var(--gradient-primary)] mb-6 animate-pulse-glow">
+            <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-[var(--gradient-primary)] mb-6 animate-pulse-glow hover:animate-glow transition-all duration-300 hover:scale-110">
               <Trophy className="w-12 h-12 text-primary-foreground" />
             </div>
-            <h1 className="text-5xl font-black mb-4 gradient-text drop-shadow-lg">
+            <h1 className="text-5xl font-black mb-4 gradient-text drop-shadow-lg animate-fade-in-up">
               Create Tournament
             </h1>
-            <p className="text-muted-foreground text-xl font-medium">
+            <p className="text-muted-foreground text-xl font-medium animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
               Set up your tournament and share the link for players to register
             </p>
           </div>
 
           {/* Creation Form */}
-          <Card className="p-10 backdrop-blur-lg border-2 border-primary/30 shadow-[var(--shadow-intense)]">
-            <div className="space-y-8">
+          <Card className="p-10 backdrop-blur-lg border-2 border-primary/30 shadow-[var(--shadow-intense)] animate-scale-in" style={{ animationDelay: '0.2s' }}>
+            <div className="space-y-8 stagger-children">
               {/* Tournament Name */}
               <div className="space-y-2">
                 <label className="flex items-center gap-2 text-sm font-medium">
@@ -103,7 +103,7 @@ const CreateTournamentPage = () => {
                   placeholder="e.g., Friday Night Showdown"
                   value={tournamentName}
                   onChange={(e) => setTournamentName(e.target.value)}
-                  className="h-12 text-lg border-2 focus:border-primary"
+                  className="h-12 text-lg border-2 focus:border-primary transition-all duration-300 focus:shadow-[var(--shadow-subtle)]"
                 />
               </div>
 
@@ -117,7 +117,7 @@ const CreateTournamentPage = () => {
                   placeholder="Enter your name"
                   value={creatorName}
                   onChange={(e) => setCreatorName(e.target.value)}
-                  className="h-12 text-lg border-2 focus:border-primary"
+                  className="h-12 text-lg border-2 focus:border-primary transition-all duration-300 focus:shadow-[var(--shadow-subtle)]"
                 />
               </div>
 
@@ -133,7 +133,7 @@ const CreateTournamentPage = () => {
                   max={256}
                   value={maxParticipants}
                   onChange={(e) => setMaxParticipants(parseInt(e.target.value) || 16)}
-                  className="h-12 text-lg border-2 focus:border-primary"
+                  className="h-12 text-lg border-2 focus:border-primary transition-all duration-300 focus:shadow-[var(--shadow-subtle)]"
                 />
                 <p className="text-xs text-muted-foreground">
                   How many players can join this tournament (2-256)
@@ -143,7 +143,7 @@ const CreateTournamentPage = () => {
               {/* Registration Schedule Section */}
               <div className="space-y-4 pt-4 border-t-2 border-primary/20">
                 <h3 className="text-xl font-bold flex items-center gap-2">
-                  <CalendarClock className="w-6 h-6 text-primary" />
+                  <CalendarClock className="w-6 h-6 text-primary animate-pulse-soft" />
                   Registration Schedule (Optional)
                 </h3>
                 <p className="text-sm text-muted-foreground">
@@ -176,17 +176,17 @@ const CreateTournamentPage = () => {
               </div>
 
               {/* Info Box */}
-              <div className="bg-primary/5 border-2 border-primary/20 rounded-lg p-4">
+              <div className="bg-primary/5 border-2 border-primary/20 rounded-lg p-4 hover:bg-primary/10 hover:border-primary/40 transition-all duration-300">
                 <div className="flex gap-3">
                   <Share2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                   <div className="space-y-1">
                     <p className="font-medium text-sm">What happens next?</p>
                     <ul className="text-sm text-muted-foreground space-y-1">
-                      <li>🔗 Share your tournament link with players</li>
-                      <li>👥 Players register themselves via the link</li>
-                      <li>✨ Generate matchups once everyone has joined</li>
-                      <li>🎮 Only you can manage the tournament</li>
-                      <li>⏰ Registration window will be enforced automatically</li>
+                      <li className="hover:text-foreground transition-colors">🔗 Share your tournament link with players</li>
+                      <li className="hover:text-foreground transition-colors">👥 Players register themselves via the link</li>
+                      <li className="hover:text-foreground transition-colors">✨ Generate matchups once everyone has joined</li>
+                      <li className="hover:text-foreground transition-colors">🎮 Only you can manage the tournament</li>
+                      <li className="hover:text-foreground transition-colors">⏰ Registration window will be enforced automatically</li>
                     </ul>
                   </div>
                 </div>
@@ -197,14 +197,17 @@ const CreateTournamentPage = () => {
                 onClick={handleCreateTournament}
                 disabled={isCreating || !tournamentName.trim() || !creatorName.trim()}
                 variant="gradient"
-                className="w-full h-16 text-xl font-bold"
+                className="w-full h-16 text-xl font-bold group"
                 size="lg"
               >
                 {isCreating ? (
-                  <>Creating Tournament...</>
+                  <span className="flex items-center gap-2">
+                    <span className="animate-spin-slow">⚡</span>
+                    Creating Tournament...
+                  </span>
                 ) : (
                   <>
-                    <Trophy className="w-6 h-6 mr-2" />
+                    <Trophy className="w-6 h-6 mr-2 group-hover:animate-wiggle" />
                     Create Tournament 🚀
                   </>
                 )}

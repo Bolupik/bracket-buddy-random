@@ -124,7 +124,10 @@ const TournamentBrowserPage = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-[var(--gradient-dark)] flex items-center justify-center">
-        <p className="text-xl">Loading tournaments...</p>
+        <div className="flex flex-col items-center gap-4 animate-pulse-soft">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <p className="text-xl font-medium">Loading tournaments...</p>
+        </div>
       </div>
     );
   }
@@ -135,7 +138,7 @@ const TournamentBrowserPage = () => {
       <div className="fixed inset-0 bg-[var(--gradient-hero)] pointer-events-none" />
       
       <div className="container max-w-4xl mx-auto px-4 pt-24 pb-12 relative z-10">
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex justify-between items-center mb-8 animate-fade-in-down">
           <div>
             <h1 className="text-4xl font-black gradient-text mb-2">
               Available Tournaments
@@ -154,15 +157,15 @@ const TournamentBrowserPage = () => {
           </Button>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-4 stagger-children">
           {tournaments.length === 0 ? (
-            <Card className="p-12 text-center backdrop-blur-lg border-2 border-primary/30">
-              <Trophy className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+            <Card className="p-12 text-center backdrop-blur-lg border-2 border-primary/30 animate-scale-in">
+              <Trophy className="w-16 h-16 mx-auto mb-4 text-muted-foreground animate-float" />
               <p className="text-xl font-semibold mb-2">No tournaments available</p>
               <p className="text-muted-foreground">Check back later for new tournaments!</p>
             </Card>
           ) : (
-            tournaments.map((tournament) => {
+            tournaments.map((tournament, index) => {
               const registeredUsers = Array.isArray(tournament.registered_users) ? tournament.registered_users : [];
               const registeredCount = registeredUsers.length;
               const isRegistered = session?.user && registeredUsers.some((u: any) => u.id === session.user.id);
@@ -172,24 +175,25 @@ const TournamentBrowserPage = () => {
               return (
                 <Card
                   key={tournament.id}
-                  className="p-6 backdrop-blur-lg border-2 border-primary/30 hover:border-primary/50 transition-all"
+                  className="p-6 backdrop-blur-lg border-2 border-primary/30 hover:border-primary/50 transition-all group"
+                  style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   <div className="space-y-4">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-3">
-                          <h3 className="text-2xl font-bold">{tournament.name}</h3>
-                          <Badge variant={isRegistered ? "default" : "secondary"}>
+                          <h3 className="text-2xl font-bold group-hover:text-primary transition-colors">{tournament.name}</h3>
+                          <Badge variant={isRegistered ? "default" : "secondary"} className="animate-scale-in">
                             {isRegistered ? "Registered" : "Open"}
                           </Badge>
                         </div>
                         
                         <div className="flex gap-6 text-sm text-muted-foreground mb-4">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 group-hover:text-foreground transition-colors">
                             <Users className="w-4 h-4" />
                             {registeredCount} / {tournament.max_participants} players
                           </div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 group-hover:text-foreground transition-colors">
                             <Calendar className="w-4 h-4" />
                             {new Date(tournament.created_at).toLocaleDateString()}
                           </div>
@@ -200,6 +204,7 @@ const TournamentBrowserPage = () => {
                         onClick={() => handleRegister(tournament)}
                         disabled={isRegistered || isFull || !registrationOpen}
                         variant={isRegistered ? "outline" : "gradient"}
+                        className="group-hover:shadow-[var(--shadow-intense)]"
                       >
                         {isRegistered 
                           ? "Registered ✓" 
