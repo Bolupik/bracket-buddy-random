@@ -421,7 +421,7 @@ export const BracketGenerator = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--gradient-dark)] relative overflow-hidden">
+    <div className="min-h-screen bg-[var(--gradient-dark)] relative overflow-hidden noise-overlay">
       {/* Scrolling Sponsor Ads at Top */}
       <ScrollingToolAds />
       
@@ -436,7 +436,7 @@ export const BracketGenerator = () => {
       />
       
       {/* Pokemon Background */}
-      <div className="fixed inset-0 pointer-events-none opacity-15 z-0">
+      <div className="fixed inset-0 pointer-events-none opacity-10 z-0">
         {pokemonImages.map((img, index) => {
           const animations = ['animate-float-drift', 'animate-float-spin', 'animate-float-bounce', 'animate-float-zigzag'];
           const randomAnimation = animations[index % animations.length];
@@ -458,7 +458,7 @@ export const BracketGenerator = () => {
                 left: `${left}%`,
                 animationDelay: `${delay}s`,
                 animationDuration: `${duration}s`,
-                filter: 'drop-shadow(0 0 10px hsl(var(--primary) / 0.3))',
+                filter: 'drop-shadow(0 0 10px hsl(var(--primary) / 0.2))',
               }}
             />
           );
@@ -472,34 +472,28 @@ export const BracketGenerator = () => {
         </div>
 
         {/* Header */}
-        <div className="text-center space-y-6 animate-fade-in relative">
-          <div className="absolute inset-0 bg-[var(--gradient-primary)] opacity-10 blur-3xl -z-10"></div>
-          <div className="relative">
-            <h1 className="text-5xl md:text-7xl font-black tracking-tight">
-              <span className="bg-[var(--gradient-primary)] bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(34,197,94,0.3)]">
-                🎮 Tournament Time! 🎮
-              </span>
-            </h1>
-            <p className="text-2xl md:text-3xl font-bold text-foreground mt-4">
-              Create Your Pokemon Battle!
-            </p>
-          </div>
-          <p className="text-xl text-foreground/80 font-medium max-w-2xl mx-auto">
+        <div className="text-center space-y-4 animate-fade-in relative pt-8">
+          <h1 className="text-4xl md:text-6xl font-black tracking-tighter">
+            <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+              🎮 Tournament Time! 🎮
+            </span>
+          </h1>
+          <p className="text-lg md:text-xl text-muted-foreground font-medium max-w-xl mx-auto">
             Everyone gets 3 fun matches! Add your friends and let's start! 🌟
           </p>
           
           {/* Status badges */}
-          <div className="flex flex-wrap items-center justify-center gap-3">
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
             {userName && tournamentId && (
-              <div className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-accent/30 border-2 border-accent shadow-lg">
-                <User className="w-5 h-5 text-accent" />
-                <span className="text-base font-bold text-accent">{userName}</span>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border-primary/20">
+                <User className="w-4 h-4 text-primary" />
+                <span className="text-sm font-bold text-primary">{userName}</span>
               </div>
             )}
             {participants.length > 0 && (
-              <div className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-primary/30 border-2 border-primary shadow-lg">
-                <User className="w-5 h-5 text-primary" />
-                <span className="text-base font-bold text-primary">{participants.length} Players</span>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border-primary/20">
+                <User className="w-4 h-4 text-primary" />
+                <span className="text-sm font-bold text-primary">{participants.length} Players</span>
               </div>
             )}
           </div>
@@ -507,15 +501,15 @@ export const BracketGenerator = () => {
 
         {/* Welcome message for non-creators */}
         {!tournamentCreated && !isCreator && (
-          <Card className="p-8 bg-gradient-to-br from-primary/10 to-accent/10 border-2 border-primary/30 shadow-xl animate-scale-in">
-            <div className="text-center space-y-4">
-              <div className="text-6xl">🎮</div>
-              <h2 className="text-3xl font-bold">Welcome to Tournament View!</h2>
-              <p className="text-xl text-foreground/70">Use a tournament link to join, or create your own tournament</p>
+          <Card className="p-10 glass border-primary/20 animate-scale-in">
+            <div className="text-center space-y-5">
+              <div className="text-5xl">🎮</div>
+              <h2 className="text-2xl font-bold tracking-tight">Welcome to Tournament View!</h2>
+              <p className="text-muted-foreground text-lg">Use a tournament link to join, or create your own</p>
               <Button
                 onClick={() => navigate('/create')}
                 size="lg"
-                className="text-xl px-8 py-6 h-auto font-bold mt-4"
+                className="text-lg px-8 py-5 h-auto font-bold mt-2"
               >
                 ✨ Create New Tournament
               </Button>
@@ -525,7 +519,7 @@ export const BracketGenerator = () => {
 
         {/* Input Section - Only show for creators */}
         {isCreator && (
-          <Card className="p-8 shadow-2xl animate-scale-in bg-[var(--gradient-card)] backdrop-blur-lg border-3 border-primary/40">
+          <Card className="p-8 shadow-xl animate-scale-in glass-strong border-primary/20">
             {tournamentCreated && matchups.length > 0 && (
               <div className="mb-6 p-4 bg-primary/10 border-2 border-primary/30 rounded-xl">
                 <div className="flex items-center gap-3">
@@ -633,15 +627,15 @@ export const BracketGenerator = () => {
         {/* Tournament Display */}
         {matchups.length > 0 && (
           <div className="space-y-6 animate-fade-in">
-            <Card className="p-6 bg-gradient-to-r from-primary/20 to-accent/20 border-2 border-primary/30 shadow-xl">
+            <Card className="p-6 glass border-primary/20">
               <div className="text-center space-y-3">
-                <div className="text-5xl">⚔️</div>
-                <h2 className="text-4xl font-black">
+                <div className="text-4xl">⚔️</div>
+                <h2 className="text-3xl font-black tracking-tight">
                   Battle Matches!
                 </h2>
-                <div className="inline-flex items-center gap-3 px-6 py-3 bg-card/80 rounded-full border-2 border-primary/40">
-                  <span className="text-2xl">✅</span>
-                  <p className="text-xl font-bold">
+                <div className="inline-flex items-center gap-3 px-5 py-2.5 glass rounded-full">
+                  <span className="text-xl">✅</span>
+                  <p className="text-lg font-bold">
                     {matchups.reduce((acc, m) => acc + m.matches.filter(match => match.completed).length, 0)} / {matchups.reduce((acc, m) => acc + m.matches.length, 0)} Matches Done
                   </p>
                 </div>
@@ -707,30 +701,30 @@ export const BracketGenerator = () => {
               {matchups.map((matchup, index) => (
                 <Card
                   key={index}
-                  className="p-6 space-y-5 hover:shadow-2xl transition-all animate-scale-in bg-gradient-to-br from-card/90 to-primary/5 backdrop-blur-sm border-3 border-primary/30"
+                  className="p-6 space-y-5 glass border-primary/15 animate-scale-in"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   {/* Main Participant */}
-                  <div className="flex items-center gap-4 p-5 bg-gradient-to-r from-primary/20 to-accent/20 rounded-xl border-3 border-primary/40 shadow-lg">
-                    <Avatar className="w-20 h-20 border-4 border-primary shadow-md">
+                  <div className="flex items-center gap-4 p-4 rounded-xl bg-primary/10 border border-primary/20">
+                    <Avatar className="w-16 h-16 border-2 border-primary/30 shadow-md">
                       <AvatarImage src={matchup.participant.image} alt={matchup.participant.name} />
-                      <AvatarFallback className="bg-primary text-primary-foreground font-bold text-2xl">
+                      <AvatarFallback className="bg-primary text-primary-foreground font-bold text-xl">
                         {matchup.participant.name[0].toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="text-base text-foreground/60 font-semibold">⭐ Player</p>
-                      <p className="text-2xl font-black text-foreground">
+                      <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">⭐ Player</p>
+                      <p className="text-xl font-black text-foreground">
                         {matchup.participant.name}
                       </p>
                     </div>
                   </div>
 
                   {/* Opponents */}
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-center gap-2 py-2 px-4 bg-primary/10 rounded-lg border-2 border-primary/30">
-                      <span className="text-2xl">⚔️</span>
-                      <p className="text-lg font-bold text-foreground">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-center gap-2 py-2 px-4 glass rounded-lg">
+                      <span className="text-lg">⚔️</span>
+                      <p className="text-sm font-bold text-foreground">
                         Battles: {matchup.matches.filter(m => m.completed).length}/{matchup.matches.length}
                       </p>
                     </div>
