@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Sparkles, Trophy, Users, ArrowRight } from "lucide-react";
+import { Sparkles, Zap, Trophy, Users } from "lucide-react";
 import pikachuImage from "@/assets/pikachu.png";
 import { PageTransition, usePageTransition } from "@/components/PageTransition";
 
@@ -17,6 +17,7 @@ const LandingPage = () => {
   const { isTransitioning, targetPath, startTransition, completeTransition } = usePageTransition();
   const [pokemonCards, setPokemonCards] = useState<PokemonCard[]>([]);
   
+  // Redirect to home if there's a tournament parameter
   useEffect(() => {
     const tournamentId = searchParams.get('tournament');
     if (tournamentId) {
@@ -24,9 +25,10 @@ const LandingPage = () => {
     }
   }, [searchParams, navigate]);
 
+  // Fetch Pokemon for cards
   useEffect(() => {
     const fetchPokemon = async () => {
-      const pokemonIds = [25, 6, 150, 94, 131, 143, 149, 196, 448, 445];
+      const pokemonIds = [25, 6, 150, 94, 131, 143, 149, 196, 448, 445]; // Iconic Pokemon
       const cards: PokemonCard[] = [];
       
       for (const id of pokemonIds) {
@@ -88,19 +90,30 @@ const LandingPage = () => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden bg-background noise-overlay">
-      {/* Ambient Background */}
+    <div className="min-h-screen flex flex-col relative overflow-hidden bg-background">
+      {/* Animated Background Orbs - Green/Teal Theme */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute w-[900px] h-[900px] -top-60 -left-40 bg-primary/15 rounded-full blur-[120px] animate-float-drift" />
-        <div className="absolute w-[700px] h-[700px] top-1/2 -right-40 bg-accent/10 rounded-full blur-[100px] animate-float-bounce" style={{ animationDelay: '2s' }} />
-        <div className="absolute w-[500px] h-[500px] -bottom-20 left-1/4 bg-primary/8 rounded-full blur-[80px] animate-float-zigzag" style={{ animationDelay: '4s' }} />
+        <div className="absolute w-[800px] h-[800px] -top-40 -left-40 bg-primary/20 rounded-full blur-3xl animate-float-drift" />
+        <div className="absolute w-[600px] h-[600px] top-1/2 -right-32 bg-accent/15 rounded-full blur-3xl animate-float-bounce" style={{ animationDelay: '2s' }} />
+        <div className="absolute w-[500px] h-[500px] -bottom-20 left-1/4 bg-primary/10 rounded-full blur-3xl animate-float-zigzag" style={{ animationDelay: '4s' }} />
+        <div className="absolute w-[400px] h-[400px] top-1/3 left-1/3 bg-accent/10 rounded-full blur-3xl animate-float-spin" style={{ animationDelay: '6s' }} />
       </div>
 
-      {/* Subtle grid */}
-      <div className="absolute inset-0 opacity-[0.02]" style={{
-        backgroundImage: `linear-gradient(hsl(var(--primary)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--primary)) 1px, transparent 1px)`,
-        backgroundSize: '60px 60px'
-      }} />
+      {/* Hexagon Pattern Overlay */}
+      <div className="absolute inset-0 opacity-[0.03]">
+        <div className="w-full h-full" style={{
+          backgroundImage: `radial-gradient(circle at center, hsl(var(--primary)) 1px, transparent 1px)`,
+          backgroundSize: '30px 30px'
+        }} />
+      </div>
+
+      {/* Diagonal Lines Decoration */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
+        <div className="absolute -left-20 top-1/4 w-96 h-px bg-gradient-to-r from-primary/40 to-transparent rotate-45" />
+        <div className="absolute -right-20 bottom-1/4 w-96 h-px bg-gradient-to-l from-accent/40 to-transparent -rotate-45" />
+      </div>
 
       {/* Floating Pokemon Cards */}
       {pokemonCards.map((pokemon, index) => {
@@ -108,24 +121,33 @@ const LandingPage = () => {
         return (
           <div
             key={pokemon.id}
-            className="absolute hidden lg:block pointer-events-none z-10 animate-float-drift"
+            className="absolute hidden md:block pointer-events-none z-10 animate-float-drift"
             style={{
-              top: pos.top, left: pos.left, right: pos.right, bottom: pos.bottom,
+              top: pos.top,
+              left: pos.left,
+              right: pos.right,
+              bottom: pos.bottom,
               transform: `rotate(${pos.rotate}deg) scale(${pos.scale})`,
               animationDelay: `${pos.delay}s`,
               animationDuration: '20s',
             }}
           >
-            <div className={`w-40 h-56 rounded-2xl bg-gradient-to-br ${getTypeColor(pokemon.types[0])} p-[2px] shadow-2xl opacity-40 transition-opacity duration-500`}>
-              <div className="w-full h-full rounded-[14px] bg-card/95 backdrop-blur-sm p-3 flex flex-col">
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{pokemon.types[0]}</span>
-                  <span className="text-[10px] font-mono text-muted-foreground/60">#{pokemon.id.toString().padStart(3, '0')}</span>
+            <div className={`w-44 h-60 rounded-2xl bg-gradient-to-br ${getTypeColor(pokemon.types[0])} p-1 shadow-2xl opacity-60 hover:opacity-100 transition-opacity`}>
+              <div className="w-full h-full rounded-xl bg-card/95 backdrop-blur-sm p-3 flex flex-col border border-border/50">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-xs font-bold text-foreground/80 uppercase tracking-wider">{pokemon.types[0]}</span>
+                  <span className="text-xs font-mono text-muted-foreground">#{pokemon.id.toString().padStart(3, '0')}</span>
                 </div>
                 <div className="flex-1 flex items-center justify-center">
-                  <img src={pokemon.image} alt={pokemon.name} className="w-24 h-24 object-contain drop-shadow-[0_0_15px_hsl(var(--primary)/0.3)]" />
+                  <img 
+                    src={pokemon.image} 
+                    alt={pokemon.name}
+                    className="w-28 h-28 object-contain drop-shadow-[0_0_20px_hsl(var(--primary)/0.4)]"
+                  />
                 </div>
-                <p className="text-center text-foreground font-bold text-xs">{pokemon.name}</p>
+                <div className="text-center">
+                  <h3 className="text-foreground font-bold text-sm">{pokemon.name}</h3>
+                </div>
               </div>
             </div>
           </div>
@@ -133,20 +155,20 @@ const LandingPage = () => {
       })}
 
       {/* Header */}
-      <header className="relative z-20 w-full px-6 md:px-12 py-6 flex items-center justify-between">
+      <header className="relative z-20 w-full px-6 md:px-12 py-8 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg overflow-hidden">
-            <img src={pikachuImage} alt="Logo" className="w-9 h-9 object-contain" />
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg animate-pulse-glow overflow-hidden">
+            <img src={pikachuImage} alt="Logo" className="w-10 h-10 object-contain" />
           </div>
           <span className="text-foreground font-bold text-lg tracking-tight hidden sm:block">PokéBattle</span>
         </div>
         
-        <nav className="flex items-center gap-1">
-          <a href="#" className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors px-4 py-2 rounded-lg hover:bg-secondary/50">About</a>
-          <a href="#" className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors px-4 py-2 rounded-lg hover:bg-secondary/50">Rules</a>
+        <nav className="flex items-center gap-6">
+          <a href="#" className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors">About</a>
+          <a href="#" className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors">Rules</a>
           <button 
             onClick={() => startTransition("/home")}
-            className="ml-2 glass text-foreground px-5 py-2.5 rounded-full text-sm font-semibold transition-all hover:bg-primary/10 hover:border-primary/30"
+            className="bg-secondary hover:bg-secondary/80 text-foreground px-4 py-2 rounded-full text-sm font-medium transition-all border border-border"
           >
             Enter Arena
           </button>
@@ -155,45 +177,45 @@ const LandingPage = () => {
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col items-center justify-center px-4 relative z-20">
-        <div className="text-center max-w-3xl mx-auto space-y-10">
+        {/* Hero Section */}
+        <div className="text-center max-w-4xl mx-auto space-y-8">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 glass rounded-full px-5 py-2.5 animate-fade-in">
+          <div className="inline-flex items-center gap-2 bg-primary/10 backdrop-blur-sm border border-primary/30 rounded-full px-4 py-2">
             <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-foreground/80 text-sm font-medium tracking-wide">Season 2 Now Live</span>
+            <span className="text-foreground/90 text-sm font-medium">Season 2 Now Live</span>
           </div>
           
           {/* Main Title */}
-          <div className="space-y-2 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-            <h1 className="text-6xl md:text-8xl lg:text-9xl font-black text-foreground leading-[0.9] tracking-tighter">
-              BRACKET
-            </h1>
-            <h1 className="text-6xl md:text-8xl lg:text-9xl font-black leading-[0.9] tracking-tighter bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-              BUDDY
+          <div className="space-y-4">
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-foreground leading-none tracking-tight">
+              <span className="block">BRACKET</span>
+              <span className="block bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-pulse">
+                BUDDY
+              </span>
             </h1>
           </div>
           
           {/* Subtitle */}
-          <p className="text-muted-foreground text-lg md:text-xl max-w-xl mx-auto leading-relaxed animate-fade-in" style={{ animationDelay: '0.2s' }}>
-            Create epic tournament brackets, battle your friends, and crown the ultimate Pokémon champion.
+          <p className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+            Create epic tournament brackets, battle your friends, and become the ultimate Pokémon champion. Every trainer gets 3 matches!
           </p>
           
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
             <button
               onClick={() => startTransition("/home")}
-              className="group relative overflow-hidden bg-gradient-to-r from-primary to-accent text-primary-foreground px-8 py-4 rounded-2xl text-lg font-bold shadow-[var(--shadow-glow)] hover:shadow-[var(--shadow-intense)] transition-all hover:scale-[1.03] active:scale-[0.98]"
+              className="group relative overflow-hidden bg-gradient-to-r from-primary to-accent text-primary-foreground px-8 py-4 rounded-2xl text-lg font-bold shadow-glow hover:shadow-intense transition-all hover:scale-105"
             >
-              <span className="relative z-10 flex items-center gap-3">
+              <span className="relative z-10 flex items-center gap-2">
                 <Trophy className="w-5 h-5" />
                 Start Tournament
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-accent to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-r from-accent to-primary opacity-0 group-hover:opacity-100 transition-opacity" />
             </button>
             
             <button
               onClick={() => startTransition("/tournaments")}
-              className="flex items-center gap-2 glass text-foreground px-8 py-4 rounded-2xl text-lg font-medium transition-all hover:bg-primary/10 hover:border-primary/30 active:scale-[0.98]"
+              className="flex items-center gap-2 bg-card hover:bg-secondary text-foreground px-8 py-4 rounded-2xl text-lg font-medium border border-border transition-all hover:border-primary/50"
             >
               <Users className="w-5 h-5" />
               Browse Tournaments
@@ -201,31 +223,32 @@ const LandingPage = () => {
           </div>
           
           {/* Stats */}
-          <div className="flex items-center justify-center gap-10 md:gap-16 pt-6 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-            {[
-              { value: '1000+', label: 'Battles' },
-              { value: '500+', label: 'Trainers' },
-              { value: '50+', label: 'Tournaments' },
-            ].map((stat, i) => (
-              <div key={stat.label} className="flex items-center gap-10">
-                {i > 0 && <div className="w-px h-10 bg-border -ml-10" />}
-                <div className="text-center group cursor-default">
-                  <div className="text-3xl md:text-4xl font-black text-foreground group-hover:text-primary transition-colors duration-300">{stat.value}</div>
-                  <div className="text-muted-foreground text-xs font-medium uppercase tracking-wider mt-1">{stat.label}</div>
-                </div>
-              </div>
-            ))}
+          <div className="flex items-center justify-center gap-8 md:gap-16 pt-8">
+            <div className="text-center group">
+              <div className="text-3xl md:text-4xl font-black text-foreground group-hover:text-primary transition-colors">1000+</div>
+              <div className="text-muted-foreground text-sm">Battles</div>
+            </div>
+            <div className="w-px h-12 bg-border" />
+            <div className="text-center group">
+              <div className="text-3xl md:text-4xl font-black text-foreground group-hover:text-primary transition-colors">500+</div>
+              <div className="text-muted-foreground text-sm">Trainers</div>
+            </div>
+            <div className="w-px h-12 bg-border" />
+            <div className="text-center group">
+              <div className="text-3xl md:text-4xl font-black text-foreground group-hover:text-primary transition-colors">50+</div>
+              <div className="text-muted-foreground text-sm">Tournaments</div>
+            </div>
           </div>
         </div>
         
         {/* Floating Pikachu Mascot */}
-        <div className="absolute bottom-6 md:bottom-10 left-1/2 -translate-x-1/2 animate-float">
+        <div className="absolute bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 animate-float">
           <div className="relative">
-            <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-150" />
+            <div className="absolute inset-0 bg-primary/30 blur-3xl rounded-full scale-150" />
             <img 
               src={pikachuImage} 
               alt="Pikachu" 
-              className="w-16 h-16 md:w-24 md:h-24 object-contain relative z-10 drop-shadow-[0_0_20px_hsl(var(--primary)/0.4)]"
+              className="w-20 h-20 md:w-28 md:h-28 object-contain relative z-10 drop-shadow-[0_0_30px_hsl(var(--primary)/0.5)]"
             />
           </div>
         </div>
@@ -233,9 +256,10 @@ const LandingPage = () => {
 
       {/* Footer */}
       <footer className="relative z-20 py-6 text-center">
-        <p className="text-muted-foreground/40 text-xs font-medium tracking-wide">© 2024 PokéBattle Arena. Not affiliated with Nintendo or The Pokémon Company.</p>
+        <p className="text-muted-foreground/50 text-sm">© 2024 PokéBattle Arena. Not affiliated with Nintendo or The Pokémon Company.</p>
       </footer>
 
+      {/* Page Transition */}
       <PageTransition 
         isActive={isTransitioning} 
         targetPath={targetPath} 

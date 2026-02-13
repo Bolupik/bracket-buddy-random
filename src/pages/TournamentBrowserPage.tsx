@@ -9,7 +9,6 @@ import { Navigation } from "@/components/Navigation";
 import { Trophy, Users, Calendar, LogOut } from "lucide-react";
 import { Session } from "@supabase/supabase-js";
 import { RegistrationCountdown, canRegister } from "@/components/RegistrationCountdown";
-import { Skeleton, SkeletonCard } from "@/components/ui/skeleton";
 
 interface Tournament {
   id: string;
@@ -124,19 +123,10 @@ const TournamentBrowserPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[var(--gradient-dark)] relative overflow-hidden">
-        <Navigation />
-        <div className="fixed inset-0 bg-[var(--gradient-hero)] pointer-events-none" />
-        <div className="container max-w-4xl mx-auto px-4 pt-24 pb-12 relative z-10">
-          <div className="mb-8">
-            <Skeleton className="h-10 w-72 mb-2" />
-            <Skeleton className="h-5 w-56" />
-          </div>
-          <div className="space-y-4 stagger-children">
-            {[0, 1, 2].map((i) => (
-              <SkeletonCard key={i} style={{ animationDelay: `${i * 0.15}s` }} />
-            ))}
-          </div>
+      <div className="min-h-screen bg-[var(--gradient-dark)] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4 animate-pulse-soft">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <p className="text-xl font-medium">Loading tournaments...</p>
         </div>
       </div>
     );

@@ -54,19 +54,19 @@ export const MatchCard = ({ match, participantName, onUpdateResult, isAdmin }: M
 
   if (match.completed && !isEditing) {
     return (
-      <div className="flex items-center gap-4 p-4 rounded-xl transition-all duration-300 glass border-primary/15 hover:border-primary/25 animate-fade-in group">
-        <Avatar className="w-12 h-12 border-2 border-primary/30 transition-transform duration-300 group-hover:scale-105">
+      <div className="flex items-center gap-4 p-5 rounded-xl transition-all duration-300 bg-primary/10 border-3 border-primary/30 shadow-lg hover:shadow-xl hover:scale-[1.02] hover:bg-primary/15 animate-fade-in group">
+        <Avatar className="w-14 h-14 border-3 border-primary/40 transition-transform duration-300 group-hover:scale-110">
           <AvatarImage src={match.opponent.image} alt={match.opponent.name} />
-          <AvatarFallback className="bg-secondary text-secondary-foreground font-semibold text-base">
+          <AvatarFallback className="bg-secondary text-secondary-foreground font-semibold text-lg">
             {match.opponent.name[0].toUpperCase()}
           </AvatarFallback>
         </Avatar>
         <div className="flex-1">
-          <span className="font-bold text-base text-foreground block transition-colors group-hover:text-primary">
+          <span className="font-bold text-lg text-primary block transition-colors group-hover:text-accent">
             {match.opponent.name}
           </span>
           {match.score && (
-            <span className="text-sm text-muted-foreground font-medium">
+            <span className="text-base text-foreground/80 font-semibold">
               Score: {match.score}
             </span>
           )}
@@ -76,8 +76,8 @@ export const MatchCard = ({ match, participantName, onUpdateResult, isAdmin }: M
           <Button
             onClick={() => setIsEditing(true)}
             variant="ghost"
-            size="sm"
-            className="h-9 opacity-0 group-hover:opacity-100 transition-opacity text-xs"
+            size="lg"
+            className="h-12 opacity-0 group-hover:opacity-100 transition-opacity"
           >
             ✏️ Edit
           </Button>
@@ -88,7 +88,7 @@ export const MatchCard = ({ match, participantName, onUpdateResult, isAdmin }: M
 
   if (isEditing || !match.completed) {
     return (
-      <div className="p-4 rounded-xl glass border-primary/15 space-y-4 animate-scale-in">
+      <div className="p-5 rounded-xl bg-card/80 backdrop-blur-sm border-3 border-primary/30 space-y-4 shadow-lg animate-scale-in">
         <div className="flex items-center gap-4">
           <Avatar className="w-14 h-14 border-3 border-primary/40 animate-pulse-soft">
             <AvatarImage src={match.opponent.image} alt={match.opponent.name} />

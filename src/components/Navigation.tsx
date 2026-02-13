@@ -39,17 +39,17 @@ export const Navigation = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <nav className="fixed top-4 left-1/2 -translate-x-1/2 z-50 glass-strong rounded-2xl px-4 py-2.5 shadow-[var(--shadow-elegant)] animate-slide-down">
-      <div className="flex items-center gap-1 stagger-children">
+    <nav className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-[var(--gradient-card)] backdrop-blur-xl border-2 border-primary/40 rounded-full px-6 py-3 shadow-[var(--shadow-elegant)] animate-slide-down hover:shadow-[var(--shadow-intense)] transition-shadow duration-300">
+      <div className="flex items-center gap-2 stagger-children">
         {session && <NotificationBell />}
         
         <Link to="/">
           <Button
             variant={isActive("/") ? "gradient" : "ghost"}
             size="sm"
-            className="rounded-xl font-semibold text-xs h-9 px-3"
+            className="rounded-full font-semibold"
           >
-            <Home className="w-3.5 h-3.5 mr-1.5" />
+            <Home className="w-4 h-4 mr-2" />
             View
           </Button>
         </Link>
@@ -58,9 +58,9 @@ export const Navigation = () => {
           <Button
             variant={isActive("/create") ? "gradient" : "ghost"}
             size="sm"
-            className="rounded-xl font-semibold text-xs h-9 px-3"
+            className="rounded-full font-semibold"
           >
-            <Plus className="w-3.5 h-3.5 mr-1.5" />
+            <Plus className="w-4 h-4 mr-2" />
             Create
           </Button>
         </Link>
@@ -71,9 +71,9 @@ export const Navigation = () => {
               <Button
                 variant={isActive("/tournaments") ? "gradient" : "ghost"}
                 size="sm"
-                className="rounded-xl font-semibold text-xs h-9 px-3"
+                className="rounded-full font-semibold"
               >
-                <ListTodo className="w-3.5 h-3.5 mr-1.5" />
+                <ListTodo className="w-4 h-4 mr-2" />
                 Tournaments
               </Button>
             </Link>
@@ -82,9 +82,9 @@ export const Navigation = () => {
               <Button
                 variant={isActive("/schedule") ? "gradient" : "ghost"}
                 size="sm"
-                className="rounded-xl font-semibold text-xs h-9 px-3"
+                className="rounded-full font-semibold"
               >
-                <Calendar className="w-3.5 h-3.5 mr-1.5" />
+                <Calendar className="w-4 h-4 mr-2" />
                 Schedule
               </Button>
             </Link>
@@ -93,9 +93,9 @@ export const Navigation = () => {
               <Button
                 variant={isActive("/availability") ? "gradient" : "ghost"}
                 size="sm"
-                className="rounded-xl font-semibold text-xs h-9 px-3"
+                className="rounded-full font-semibold"
               >
-                <Clock className="w-3.5 h-3.5 mr-1.5" />
+                <Clock className="w-4 h-4 mr-2" />
                 Availability
               </Button>
             </Link>
@@ -105,9 +105,9 @@ export const Navigation = () => {
                 <Button
                   variant={isActive("/admin") ? "gradient" : "ghost"}
                   size="sm"
-                  className="rounded-xl font-semibold text-xs h-9 px-3"
+                  className="rounded-full font-semibold"
                 >
-                  <Shield className="w-3.5 h-3.5 mr-1.5" />
+                  <Shield className="w-4 h-4 mr-2" />
                   Admin
                 </Button>
               </Link>
@@ -115,15 +115,13 @@ export const Navigation = () => {
           </>
         )}
 
-        <div className="w-px h-5 bg-border mx-1" />
-
         <Link to="/random-wheel">
           <Button
             variant={isActive("/random-wheel") ? "gradient" : "ghost"}
             size="sm"
-            className="rounded-xl h-9 w-9 p-0"
+            className="rounded-full font-semibold"
           >
-            <Dices className="w-3.5 h-3.5" />
+            <Dices className="w-4 h-4" />
           </Button>
         </Link>
 
@@ -131,9 +129,9 @@ export const Navigation = () => {
           <Button
             variant={isActive("/wheel") ? "gradient" : "ghost"}
             size="sm"
-            className="rounded-xl h-9 w-9 p-0"
+            className="rounded-full font-semibold"
           >
-            <Trophy className="w-3.5 h-3.5" />
+            <Trophy className="w-4 h-4" />
           </Button>
         </Link>
       </div>
