@@ -2,7 +2,7 @@
 
 ## Project info
 
-**URL**: https://lovable.dev/projects/1fba3472-7a71-4ce5-a4a8-34b52b117311
+**URL**: https://bracket-buddy-random.lovable.app
 
 ## How can I edit this code?
 
